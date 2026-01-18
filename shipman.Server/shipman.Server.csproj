@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<SpaRoot>..\shipman.client</SpaRoot>
+		<SpaProxyLaunchCommand>npm run dev</SpaProxyLaunchCommand>
+		<SpaProxyWorkingDirectory>..\shipman.client</SpaProxyWorkingDirectory>
+		<SpaProxyServerUrl>https://localhost:62992</SpaProxyServerUrl>
+		<SpaProxyTimeout>120</SpaProxyTimeout>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.*" />
+		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.*" />
+		<PackageReference Include="Microsoft.AspNetCore.SpaProxy" Version="10.*" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.*" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.*">
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		  <PrivateAssets>all</PrivateAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.*" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.*">
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		  <PrivateAssets>all</PrivateAssets>
+		</PackageReference>
+		<PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.0.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\shipman.client\shipman.client.esproj">
+			<ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+		</ProjectReference>
+	</ItemGroup>
+
+</Project>
