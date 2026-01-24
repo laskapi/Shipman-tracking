@@ -2,14 +2,16 @@ import { useState } from "react"
 import { DataGrid } from "@mui/x-data-grid"
 import type { GridColDef } from "@mui/x-data-grid"
 import { Box, Typography } from "@mui/material"
-import { useGetShipmentsQuery, useGetShipmentStatusesQuery } from "../services/shipmentApi"
-import { ShipmentsToolbar } from "../Components/ShipmentsToolbar"
-import { StatusBadge } from "../Components/StatusBadgeComponent"
+import { useGetShipmentsQuery, useGetShipmentStatusesQuery } from "@/services/shipmentsApi"
+import { ShipmentsToolbar } from "@/components/ShipmentsToolbar"
+import  StatusBadge  from "@/components/StatusBadge"
+import { useNavigate } from "react-router-dom"
 
-export default function Shipments() {
+export default function ShipmentsPage() {
     const { data: shipments, isLoading, isError, refetch } = useGetShipmentsQuery()
     const [statusFilter, setStatusFilter] = useState("")
     const [search, setSearch] = useState("")
+    const navigate=useNavigate()
     const handleClear = () => {
         setStatusFilter("")
         setSearch("")
@@ -83,6 +85,7 @@ export default function Shipments() {
                     columns={columns}
                     loading={isLoading}
                     getRowId={(row) => row.id}
+                    onRowClick={(params)=>navigate(`/shipments/${params.id}`) }
                     sortingMode="client"
                     initialState={{
                         sorting: {

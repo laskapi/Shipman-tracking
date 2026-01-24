@@ -1,13 +1,14 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom"
-import Login from "./Pages/Login"
-import Register from "./Pages/Register"
-import Dashboard from "./Pages/Dashboard"
+import Login from "./pages/Login"
+import Register from "./pages/Register"
+import Dashboard from "./pages/DashboardPage"
 import ProtectedRoute from "./features/auth/ProtectedRoute"
 import { useGetProfileQuery } from "./services/authApi"
 import { useAppDispatch } from "./store/hooks"
 import { useEffect } from "react"
 import { setAuthenticated, clearAuth } from "./store/authSlice"
-import Shipments from "./Pages/Shipments"
+import ShipmentsPage from "./pages/ShipmentsPage"
+import ShipmentDetailsPage from "./pages/ShipmentDetailsPage"
 
 export default function App() {
     const { data, isSuccess, isError } = useGetProfileQuery()
@@ -39,10 +40,19 @@ export default function App() {
                     path="/shipments"
                     element={
                         <ProtectedRoute>
-                            <Shipments />
+                            <ShipmentsPage />
                         </ProtectedRoute>
                     }
                 />
+                <Route
+                    path="/shipments/:id"
+                    element={
+                        <ProtectedRoute>
+                            <ShipmentDetailsPage />
+                        </ProtectedRoute>
+                    }
+                />
+                
 
 
             </Routes>

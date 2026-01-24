@@ -1,6 +1,6 @@
-﻿namespace shipman.Server.Api.Dtos;
+﻿namespace shipman.Server.Application.Dtos;
 
-public class RegisterDto
+public class LoginDto
 {
     public string Email { get; set; } = default!;
     public string Password { get; set; } = default!;

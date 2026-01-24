@@ -34,7 +34,7 @@ export function ShipmentsToolbar({
         >
             {/* Status Filter */}
             <FormControl size="small" sx={{ width: 200 }}>
-                <InputLabel>Status</InputLabel>
+                <InputLabel shrink>Status</InputLabel>
 
                 <Select
                     label="Status"

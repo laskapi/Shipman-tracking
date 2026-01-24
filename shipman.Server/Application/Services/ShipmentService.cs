@@ -2,6 +2,7 @@
 using shipman.Server.Data;
 using shipman.Server.Domain.Entities;
 using shipman.Server.Domain.Enums;
+using System.Threading;
 
 public class ShipmentService : IShipmentService
 {
@@ -12,16 +13,34 @@ public class ShipmentService : IShipmentService
         _db = db;
     }
 
-    public async Task<Shipment> CreateAsync(CreateShipmentDto dto)
+
+
+    public async Task<Shipment> CreateShipmentAsync(CreateShipmentDto request)
     {
         var shipment = new Shipment
         {
             Id = Guid.NewGuid(),
-            TrackingNumber = Guid.NewGuid().ToString().Substring(0, 8),
-            Sender = dto.Sender,
-            Receiver = dto.Receiver,
+            TrackingNumber = Guid.NewGuid().ToString("N")[..12].ToUpper(),
+            Sender = request.Sender,
+            Receiver = request.Receiver,
+            Origin = request.Origin,
+            Destination = request.Destination,
+            Weight = request.Weight,
+            ServiceType = request.ServiceType,
             Status = ShipmentStatus.Processing,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+            Events = new List<ShipmentEvent>
+        {
+            new ShipmentEvent
+            {
+                Id = Guid.NewGuid(),
+                Timestamp = DateTime.UtcNow,
+                EventType = "Created",
+                Location = request.Origin,
+                Description = "Shipment created"
+            }
+        }
         };
 
         _db.Shipments.Add(shipment);
@@ -31,19 +50,40 @@ public class ShipmentService : IShipmentService
     }
 
     public Task<List<Shipment>> GetAllAsync() =>
-        _db.Shipments.ToListAsync();
+    _db.Shipments.ToListAsync();
 
-    public Task<Shipment?> GetByIdAsync(Guid id) =>
-        _db.Shipments.FirstOrDefaultAsync(s => s.Id == id);
 
-    public async Task<Shipment> UpdateStatusAsync(Guid id, ShipmentStatus status)
+    public async Task<Shipment?> GetByIdAsync(Guid id)
     {
-        var shipment = await _db.Shipments.FindAsync(id)
-            ?? throw new Exception("Shipment not found");
+        return await _db.Shipments
+            .Include(s => s.Events)
+            .FirstOrDefaultAsync(s => s.Id == id);
+    }
+    public async Task<Shipment?> UpdateStatusAsync(Guid id, UpdateShipmentStatusDto dto)
+    {
+        var shipment = await _db.Shipments
+            .Include(s => s.Events)
+            .FirstOrDefaultAsync(s => s.Id == id);
 
-        shipment.Status = status;
+        if (shipment == null)
+            return null;
+
+        // Update status
+        shipment.Status = dto.Status;
+        shipment.UpdatedAt = DateTime.UtcNow;
+
+        // Add event
+        shipment.Events.Add(new ShipmentEvent
+        {
+            Id = Guid.NewGuid(),
+            ShipmentId = shipment.Id,
+            Timestamp = DateTime.UtcNow,
+            EventType = dto.Status.ToString(),        
+            Location = shipment.Origin,               
+            Description = $"Status changed to {dto.Status}"
+        });
+
         await _db.SaveChangesAsync();
-
         return shipment;
     }
 }

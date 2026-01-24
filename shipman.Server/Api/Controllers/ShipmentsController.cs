@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using shipman.Server.Application.Mappings;
 
 namespace shipman.Server.Api.Controllers;
 [ApiController]
@@ -12,11 +13,17 @@ public class ShipmentsController : ControllerBase
         _service = service;
     }
 
+
     [HttpPost]
-    public async Task<IActionResult> Create(CreateShipmentDto dto)
+    public async Task<ActionResult<ShipmentDetailsDto>> CreateShipment([FromBody] CreateShipmentDto dto)
     {
-        var shipment = await _service.CreateAsync(dto);
-        return Ok(shipment);
+        var shipment = await _service.CreateShipmentAsync(dto);
+
+        return CreatedAtAction(
+            nameof(GetById),
+            new { id = shipment.Id },
+            shipment.ToDetailsDto()
+        );
     }
 
     [HttpGet]
@@ -26,17 +33,26 @@ public class ShipmentsController : ControllerBase
         return Ok(shipments);
     }
 
+
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(Guid id)
+    public async Task<ActionResult<ShipmentDetailsDto>> GetById(Guid id)
     {
         var shipment = await _service.GetByIdAsync(id);
-        return shipment is null ? NotFound() : Ok(shipment);
+
+        if (shipment == null)
+            return NotFound();
+
+        return shipment.ToDetailsDto();
+    }
+    
+    [HttpPatch("{id}/status")]
+    public async Task<ActionResult<ShipmentDetailsDto>> UpdateStatus(Guid id, UpdateShipmentStatusDto dto)
+    {
+        var shipment = await _service.UpdateStatusAsync(id, dto);
+        if (shipment == null)
+            return NotFound();
+        return shipment.ToDetailsDto();
     }
 
-    [HttpPut("{id}/status")]
-    public async Task<IActionResult> UpdateStatus(Guid id, UpdateShipmentStatusDto dto)
-    {
-        var updated = await _service.UpdateStatusAsync(id, dto.Status);
-        return Ok(updated);
-    }
+
 }

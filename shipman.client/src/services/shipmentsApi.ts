@@ -1,3 +1,4 @@
+import type { ShipmentDetails } from "../types/shipment"
 import { api } from "./api"
 
 export interface Shipment {
@@ -26,7 +27,7 @@ export const shipmentApi = api.injectEndpoints({
             query: () => "shipments"
         }),
 
-        getShipmentById: builder.query<Shipment, string>({
+        getShipmentById: builder.query<ShipmentDetails, string>({
             query: id => `shipments/${id}`
         }),
 

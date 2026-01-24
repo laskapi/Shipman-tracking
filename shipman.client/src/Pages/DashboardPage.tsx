@@ -3,7 +3,8 @@ import { Button, Typography, Box } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
 import { useAppDispatch } from '../store/hooks'
 import { clearAuth } from '../store/authSlice'
-export default function Dashboard() {
+import ShipmentsPage from './ShipmentsPage'
+export default function DashboardPage() {
     const { data: user, isLoading } = useGetProfileQuery()
     const [logout] = useLogoutMutation()
     const navigate = useNavigate()
@@ -24,14 +25,15 @@ export default function Dashboard() {
             <Button variant="outlined" onClick={handleLogout}>
                 Logout
             </Button>
-            <Button
+            
+          {/*  <Button
                 variant="contained"
                 sx={{ mt: 2 }}
                 onClick={() => navigate("/shipments")}
             >
                 View Shipments
-            </Button>
-
+            </Button>*/}
+            <ShipmentsPage/>
         </Box>
     )
 }
