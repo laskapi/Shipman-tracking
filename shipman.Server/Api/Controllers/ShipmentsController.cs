@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using shipman.Server.Application.DTOs;
 using shipman.Server.Application.Mappings;
-
+using shipman.Server.Application.Interfaces;
+using shipman.Server.Application.Dtos;
 namespace shipman.Server.Api.Controllers;
+
 [ApiController]
 [Route("api/[controller]")]
 public class ShipmentsController : ControllerBase
@@ -25,12 +28,31 @@ public class ShipmentsController : ControllerBase
             shipment.ToDetailsDto()
         );
     }
-
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<ActionResult<PagedResultDto<ShipmentListItemDto>>> GetAll(
+    int page = 1,
+    int pageSize = 20,
+    [FromQuery] ShipmentFilterDto? filter = null,
+    string sortBy = "updatedAt",
+    string direction = "desc")
     {
-        var shipments = await _service.GetAllAsync();
-        return Ok(shipments);
+        // Ensure filter object is always non-null for service logic
+        filter ??= new ShipmentFilterDto();
+
+        // Delegate filtering, sorting, and pagination to the service layer
+        var result = await _service.GetAllAsync(page, pageSize, filter, sortBy, direction);
+
+        // Map entities to lightweight list DTOs for the frontend
+        var dto = new PagedResultDto<ShipmentListItemDto>
+        {
+            Items = result.Items.Select(s => s.ToListItemDto()).ToList(),
+            Page = result.Page,
+            PageSize = result.PageSize,
+            TotalCount = result.TotalCount,
+            TotalPages = result.TotalPages
+        };
+
+        return Ok(dto);
     }
 
 
@@ -44,7 +66,7 @@ public class ShipmentsController : ControllerBase
 
         return shipment.ToDetailsDto();
     }
-    
+
     [HttpPatch("{id}/status")]
     public async Task<ActionResult<ShipmentDetailsDto>> UpdateStatus(Guid id, UpdateShipmentStatusDto dto)
     {

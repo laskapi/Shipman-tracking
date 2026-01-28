@@ -1,21 +1,10 @@
-import type { ShipmentDetails } from "../types/shipment"
-import { api } from "./api"
-
-export interface Shipment {
-    id: string
-    trackingNumber: string
-    sender: string
-    receiver: string
-    status: string
-    createdAt: string
-}
-
+import type { PagedResult, Shipment, ShipmentDetails, ShipmentListItem, ShipmentsQueryParams } from "./types"
+import { api } from "@/services/api"
 export interface CreateShipmentRequest {
     trackingNumber: string
     sender: string
     receiver: string
 }
-
 export interface UpdateShipmentStatusRequest {
     id: string
     status: string
@@ -23,8 +12,8 @@ export interface UpdateShipmentStatusRequest {
 
 export const shipmentApi = api.injectEndpoints({
     endpoints: builder => ({
-        getShipments: builder.query<Shipment[], void>({
-            query: () => "shipments"
+        getShipments: builder.query<PagedResult<ShipmentListItem>, ShipmentsQueryParams>({
+            query: (params) => ({ url: "shipments", params })
         }),
 
         getShipmentById: builder.query<ShipmentDetails, string>({
@@ -47,7 +36,7 @@ export const shipmentApi = api.injectEndpoints({
             })
         }),
         getShipmentStatuses: builder.query<string[], void>({
-            query: ()=>"metadata/shipment-statuses"
+            query: () => "metadata/shipment-statuses"
         })
     })
 })

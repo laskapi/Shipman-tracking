@@ -1,9 +1,9 @@
-﻿import { useGetShipmentByIdQuery } from "@/services/shipmentsApi";
+﻿import { useGetShipmentByIdQuery } from "./shipmentsApi";
 import { Box, Typography } from "@mui/material";
 import { useParams } from "react-router-dom";
-import ShipmentMetadata from "../components/ShipmentMetada";
-import ShipmentSummary from "../components/ShipmentSummary";
-import TimelinePanel from "../components/TimelinePanel";
+import ShipmentMetadata from "./components/ShipmentMetadata";
+import ShipmentSummary from "./components/ShipmentSummary";
+import TimelinePanel from "@/components/TimelinePanel";
 
 export default function ShipmentDetailsPage() {
     const { id } = useParams();

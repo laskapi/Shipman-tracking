@@ -10,6 +10,8 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="src\assets\**" />
+    <None Remove="src\store\**" />
     <TypeScriptConfiguration Remove="src\assets\**" />
+    <TypeScriptConfiguration Remove="src\store\**" />
   </ItemGroup>
 </Project>

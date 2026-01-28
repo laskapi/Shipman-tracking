@@ -1,4 +1,7 @@
-﻿namespace shipman.Server.Application.Mappings;
+﻿using shipman.Server.Application.DTOs;
+using shipman.Server.Domain.Entities;
+
+namespace shipman.Server.Application.Mappings;
 
 public static class ShipmentMapper
 {
@@ -29,6 +32,20 @@ public static class ShipmentMapper
                     Description = e.Description
                 })
                 .ToList()
+        };
+    }
+    public static ShipmentListItemDto ToListItemDto(this Shipment shipment)
+    {
+        return new ShipmentListItemDto
+        {
+            Id = shipment.Id,
+            TrackingNumber = shipment.TrackingNumber,
+            Sender = shipment.Sender,
+            Receiver = shipment.Receiver,
+            Origin = shipment.Origin,
+            Destination = shipment.Destination,
+            Status = shipment.Status,
+            UpdatedAt = shipment.UpdatedAt
         };
     }
 }

@@ -32,7 +32,6 @@ export function ShipmentsToolbar({
                 borderRadius: 2
             }}
         >
-            {/* Status Filter */}
             <FormControl size="small" sx={{ width: 200 }}>
                 <InputLabel shrink>Status</InputLabel>
 
@@ -54,9 +53,6 @@ export function ShipmentsToolbar({
                     ))}
                 </Select>
             </FormControl>
-
-
-            {/* Search */}
             <TextField
                 label="Search tracking number"
                 value={search}
@@ -64,8 +60,6 @@ export function ShipmentsToolbar({
                 size="small"
                 fullWidth
             />
-
-            {/* Clear */}
             <Button
                 variant="outlined"
                 color="warning"
@@ -74,8 +68,6 @@ export function ShipmentsToolbar({
             >
                 Clear
             </Button>
-
-            {/* Refresh */}
             <Button
                 variant="contained"
                 onClick={onRefresh}

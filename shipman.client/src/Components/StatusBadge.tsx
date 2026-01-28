@@ -1,6 +1,5 @@
 ﻿import { Chip } from "@mui/material"
 import { statusConfig } from "../config/statusConfig"
-
 export default function StatusBadge({ status }: { status: string }) {
     // Normalize backend value: "Processing" → "processing", "InTransit" → "intransit"
     const key = status.toLowerCase()
@@ -10,7 +9,6 @@ export default function StatusBadge({ status }: { status: string }) {
     if (!cfg) {
         return <Chip label={status} size="small" />
     }
-
     return (
         <Chip
             label={cfg.label}

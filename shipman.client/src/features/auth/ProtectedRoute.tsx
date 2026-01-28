@@ -1,5 +1,5 @@
 import type { ReactNode } from "react"
-import { useAppSelector } from "../../store/hooks"
+import { useAppSelector } from "@/app/storeHooks"
 import { Navigate } from "react-router-dom"
 
 interface ProtectedRouteNodes {

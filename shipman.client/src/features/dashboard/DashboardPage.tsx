@@ -1,9 +1,9 @@
-import { useGetProfileQuery, useLogoutMutation } from '../services/authApi'
+import { useGetProfileQuery, useLogoutMutation } from '@/features/auth/authApi'
 import { Button, Typography, Box } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
-import { useAppDispatch } from '../store/hooks'
-import { clearAuth } from '../store/authSlice'
-import ShipmentsPage from './ShipmentsPage'
+import { useAppDispatch } from '@/app/storeHooks'
+import { clearAuth } from '@/features/auth/authSlice'
+import ShipmentsPage from '@/features/shipments/ShipmentsPage'
 export default function DashboardPage() {
     const { data: user, isLoading } = useGetProfileQuery()
     const [logout] = useLogoutMutation()

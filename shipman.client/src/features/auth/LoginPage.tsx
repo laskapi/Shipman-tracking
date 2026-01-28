@@ -1,20 +1,18 @@
-import { useLoginMutation } from '../services/authApi'
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { loginSchema } from '../schemas/loginSchema'
-import type { LoginSchema } from '../schemas/loginSchema'
-import { useAppDispatch } from '../store/hooks'
-import { setAuthenticated } from '../store/authSlice'
-import { useNavigate } from 'react-router-dom'
 import {
-    TextField,
-    Button,
     Box,
-    Typography,
+    Button,
     Paper,
-  
+    TextField,
+    Typography,
 } from '@mui/material'
-import { Link } from 'react-router-dom'
+import { useForm } from 'react-hook-form'
+import { Link, useNavigate } from 'react-router-dom'
+import type { LoginSchema } from './schemas/loginSchema'
+import { loginSchema } from './schemas/loginSchema'
+import { useLoginMutation } from '@/features/auth/authApi'
+import { setAuthenticated } from '@/features/auth/authSlice'
+import { useAppDispatch } from '@/app/storeHooks'
 
 export default function Login() {
     const [login, { isLoading, error }] = useLoginMutation()

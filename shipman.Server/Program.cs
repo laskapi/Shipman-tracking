@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using shipman.Server.Application.Interfaces;
+using shipman.Server.Application.Services;
 using shipman.Server.Data;
 using System.Security.Claims;
 using System.Text.Json.Serialization;

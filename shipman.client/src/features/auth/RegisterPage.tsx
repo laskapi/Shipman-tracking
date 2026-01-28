@@ -1,15 +1,15 @@
-import { useRegisterMutation } from "../services/authApi"
-import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { registerSchema } from "../schemas/registerSchema"
-import type { RegisterSchema } from "../schemas/registerSchema"
+import { useForm } from "react-hook-form"
+import type { RegisterSchema } from "./schemas/registerSchema"
+import { registerSchema } from "./schemas/registerSchema"
+import { useRegisterMutation } from "@/features/auth/authApi"
 
 import {
-    TextField,
-    Button,
     Box,
-    Typography,
-    Paper
+    Button,
+    Paper,
+    TextField,
+    Typography
 } from "@mui/material"
 import { Link, useNavigate } from "react-router-dom"
 
