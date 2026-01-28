@@ -67,14 +67,40 @@ public class ShipmentsController : ControllerBase
         return shipment.ToDetailsDto();
     }
 
-    [HttpPatch("{id}/status")]
-    public async Task<ActionResult<ShipmentDetailsDto>> UpdateStatus(Guid id, UpdateShipmentStatusDto dto)
+    [HttpPost("{id}/events")]
+    public async Task<ActionResult<ShipmentDetailsDto>> AddEvent(Guid id, AddShipmentEventDto dto)
     {
-        var shipment = await _service.UpdateStatusAsync(id, dto);
-        if (shipment == null)
-            return NotFound();
-        return shipment.ToDetailsDto();
+        try
+        {
+            var shipment = await _service.AddEventAsync(id, dto);
+
+            if (shipment == null)
+                return NotFound("Shipment not found.");
+
+            return shipment.ToDetailsDto();
+        }
+        catch (InvalidOperationException ex)
+        {
+            // Domain invariant violation → 400 Bad Request
+            return BadRequest(ex.Message);
+        }
     }
+    [HttpPost("{id}/cancel")]
+    public async Task<ActionResult<ShipmentDetailsDto>> Cancel(Guid id)
+    {
+        try
+        {
+            var shipment = await _service.CancelShipmentAsync(id);
+            if (shipment == null)
+                return NotFound("Shipment not found.");
+            return shipment.ToDetailsDto();
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
 
 
 }

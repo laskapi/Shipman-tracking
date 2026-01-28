@@ -13,9 +13,9 @@ public static class ShipmentEventTypeExtensions
             ShipmentEventType.InTransit => ShipmentStatus.InTransit,
             ShipmentEventType.ArrivedAtFacility => ShipmentStatus.InTransit,
             ShipmentEventType.DepartedFacility => ShipmentStatus.InTransit,
-            ShipmentEventType.OutForDelivery => ShipmentStatus.Shipped,
+            ShipmentEventType.OutForDelivery => ShipmentStatus.InTransit,
             ShipmentEventType.Delivered => ShipmentStatus.Delivered,
-            ShipmentEventType.Cancelled => ShipmentStatus.Delayed,
+            ShipmentEventType.Cancelled => ShipmentStatus.Cancelled,
             _ => ShipmentStatus.Processing
         };
     }
