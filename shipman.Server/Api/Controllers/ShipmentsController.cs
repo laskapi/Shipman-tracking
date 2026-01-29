@@ -36,13 +36,8 @@ public class ShipmentsController : ControllerBase
     string sortBy = "updatedAt",
     string direction = "desc")
     {
-        // Ensure filter object is always non-null for service logic
         filter ??= new ShipmentFilterDto();
-
-        // Delegate filtering, sorting, and pagination to the service layer
         var result = await _service.GetAllAsync(page, pageSize, filter, sortBy, direction);
-
-        // Map entities to lightweight list DTOs for the frontend
         var dto = new PagedResultDto<ShipmentListItemDto>
         {
             Items = result.Items.Select(s => s.ToListItemDto()).ToList(),
@@ -54,7 +49,6 @@ public class ShipmentsController : ControllerBase
 
         return Ok(dto);
     }
-
 
     [HttpGet("{id}")]
     public async Task<ActionResult<ShipmentDetailsDto>> GetById(Guid id)
@@ -81,7 +75,6 @@ public class ShipmentsController : ControllerBase
         }
         catch (InvalidOperationException ex)
         {
-            // Domain invariant violation → 400 Bad Request
             return BadRequest(ex.Message);
         }
     }
@@ -100,7 +93,5 @@ public class ShipmentsController : ControllerBase
             return BadRequest(ex.Message);
         }
     }
-
-
 
 }

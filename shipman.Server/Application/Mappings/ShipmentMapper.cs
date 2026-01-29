@@ -21,7 +21,7 @@ public static class ShipmentMapper
             CreatedAt = shipment.CreatedAt,
             UpdatedAt = shipment.UpdatedAt,
             EstimatedDelivery = shipment.EstimatedDelivery,
-
+            
             Events = shipment.Events
                 .OrderByDescending(e => e.Timestamp)
                 .Select(e => new ShipmentEventDto

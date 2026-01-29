@@ -1,5 +1,4 @@
 ﻿using shipman.Server.Domain.Enums;
-
 public class CreateShipmentDto
 {
     public string Sender { get; set; } = default!;

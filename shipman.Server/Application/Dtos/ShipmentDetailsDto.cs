@@ -9,7 +9,7 @@ public class ShipmentDetailsDto
     public string Origin { get; set; } = default!;
     public string Destination { get; set; } = default!;
     public decimal Weight { get; set; }
-    public ServiceType ServiceType { get; set; } = default!;
+    public ServiceType ServiceType { get; set; }
     public ShipmentStatus Status { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
@@ -20,7 +20,7 @@ public class ShipmentDetailsDto
 public class ShipmentEventDto
 {
     public DateTime Timestamp { get; set; }
-    public ShipmentEventType EventType { get; set; } = default!;
+    public ShipmentEventType EventType { get; set; }
     public string Location { get; set; } = default!;
     public string Description { get; set; } = default!;
 }
