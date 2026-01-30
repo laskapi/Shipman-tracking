@@ -1,7 +1,5 @@
 ﻿using shipman.Server.Domain.Entities;
 using shipman.Server.Domain.Enums;
-using System.ComponentModel.DataAnnotations;
-using System.Data;
 
 namespace shipman.Tests.Unit.Domain;
 

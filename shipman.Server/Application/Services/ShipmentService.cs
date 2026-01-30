@@ -11,11 +11,12 @@ namespace shipman.Server.Application.Services;
 
 public class ShipmentService : IShipmentService
 {
-    private readonly AppDbContext _db;
-    public ShipmentService(AppDbContext db)
+    private readonly IAppDbContext _db;
+    public ShipmentService(IAppDbContext db)
     {
         _db = db;
     }
+
     public async Task<Shipment> CreateShipmentAsync(CreateShipmentDto request)
     {
         var shipment = new Shipment
@@ -136,15 +137,16 @@ public class ShipmentService : IShipmentService
         }
         catch (InvalidOperationException ex)
         {
-            // Let the controller translate this into a 400 Bad Request
             throw new InvalidOperationException(ex.Message);
         }
+
+        _db.ShipmentEvents.Add(evt);
 
         await _db.SaveChangesAsync();
         return shipment;
     }
 
-    public async Task<Shipment?> CancelShipmentAsync(Guid id)
+    public async Task<Shipment?> UpdateShipmentAsync(Guid id, UpdateShipmentDto dto)
     {
         var shipment = await _db.Shipments
             .Include(s => s.Events)
@@ -153,28 +155,35 @@ public class ShipmentService : IShipmentService
         if (shipment == null)
             return null;
 
-        var evt = new ShipmentEvent
-        {
-            Id = Guid.NewGuid(),
-            ShipmentId = shipment.Id,
-            Timestamp = DateTime.UtcNow,
-            EventType = ShipmentEventType.Cancelled,
-            Location = shipment.Origin,
-            Description = "Shipment cancelled"
-        };
+        // Domain rules: only allow updates before shipment is delivered or cancelled
+        if (shipment.Status == ShipmentStatus.Delivered ||
+            shipment.Status == ShipmentStatus.Cancelled)
+            throw new InvalidOperationException("Cannot update a completed shipment.");
 
-        try
-        {
-            shipment.AddEvent(evt);
-        }
-        catch (InvalidOperationException ex)
-        {
-            throw new InvalidOperationException(ex.Message);
-        }
+        if (dto.Destination != null)
+            shipment.Destination = dto.Destination;
+
+        if (dto.Weight.HasValue)
+            shipment.Weight = dto.Weight.Value;
+
+        if (dto.ServiceType.HasValue)
+            shipment.ServiceType = dto.ServiceType.Value;
 
         await _db.SaveChangesAsync();
         return shipment;
     }
+    public async Task<bool> DeleteShipmentAsync(Guid id)
+    {
+        var shipment = await _db.Shipments
+            .Include(s => s.Events)
+            .FirstOrDefaultAsync(s => s.Id == id);
 
+        if (shipment == null)
+            return false;
+
+        _db.Shipments.Remove(shipment);
+        await _db.SaveChangesAsync();
+        return true;
+    }
 
 }

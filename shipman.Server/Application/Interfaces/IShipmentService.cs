@@ -10,5 +10,6 @@ public interface IShipmentService
       string direction);
     Task<Shipment?> GetByIdAsync(Guid id);
     Task<Shipment?> AddEventAsync(Guid id, AddShipmentEventDto dto);
-    Task<Shipment?> CancelShipmentAsync(Guid id);
+    Task<Shipment?> UpdateShipmentAsync(Guid id, UpdateShipmentDto dto);
+    Task<bool> DeleteShipmentAsync(Guid id);
 }

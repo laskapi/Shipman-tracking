@@ -20,6 +20,8 @@ builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite(builder
 
 builder.Services.AddScoped<IShipmentService, ShipmentService>();
 
+builder.Services.AddScoped<IAppDbContext>(provider => provider.GetRequiredService<AppDbContext>());
+
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
 {
     options.Cookie.Name = "auth_cookie";

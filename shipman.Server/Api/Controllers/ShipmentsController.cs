@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using shipman.Server.Application.DTOs;
-using shipman.Server.Application.Mappings;
-using shipman.Server.Application.Interfaces;
 using shipman.Server.Application.Dtos;
+using shipman.Server.Application.DTOs;
+using shipman.Server.Application.Interfaces;
+using shipman.Server.Application.Mappings;
+using shipman.Server.Domain.Enums;
 namespace shipman.Server.Api.Controllers;
 
 [ApiController]
@@ -10,12 +11,10 @@ namespace shipman.Server.Api.Controllers;
 public class ShipmentsController : ControllerBase
 {
     private readonly IShipmentService _service;
-
     public ShipmentsController(IShipmentService service)
     {
         _service = service;
     }
-
 
     [HttpPost]
     public async Task<ActionResult<ShipmentDetailsDto>> CreateShipment([FromBody] CreateShipmentDto dto)
@@ -28,6 +27,7 @@ public class ShipmentsController : ControllerBase
             shipment.ToDetailsDto()
         );
     }
+
     [HttpGet]
     public async Task<ActionResult<PagedResultDto<ShipmentListItemDto>>> GetAll(
     int page = 1,
@@ -78,14 +78,24 @@ public class ShipmentsController : ControllerBase
             return BadRequest(ex.Message);
         }
     }
+
     [HttpPost("{id}/cancel")]
     public async Task<ActionResult<ShipmentDetailsDto>> Cancel(Guid id)
     {
         try
         {
-            var shipment = await _service.CancelShipmentAsync(id);
+            var dto = new AddShipmentEventDto
+            {
+                EventType = ShipmentEventType.Cancelled,
+                Location = null,
+                Description = "Shipment cancelled"
+            };
+
+            var shipment = await _service.AddEventAsync(id, dto);
+
             if (shipment == null)
                 return NotFound("Shipment not found.");
+
             return shipment.ToDetailsDto();
         }
         catch (InvalidOperationException ex)
@@ -93,5 +103,37 @@ public class ShipmentsController : ControllerBase
             return BadRequest(ex.Message);
         }
     }
+
+    [HttpPut("{id}")]
+    public async Task<ActionResult<ShipmentDetailsDto>> Update(Guid id, UpdateShipmentDto dto)
+    {
+        try
+        {
+            var shipment = await _service.UpdateShipmentAsync(id, dto);
+
+            if (shipment == null)
+                return NotFound("Shipment not found.");
+
+            return shipment.ToDetailsDto();
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        var deleted = await _service.DeleteShipmentAsync(id);
+
+        if (!deleted)
+            return NotFound("Shipment not found.");
+
+        return NoContent();
+    }
+
+
+
 
 }
