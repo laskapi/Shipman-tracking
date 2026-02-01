@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using shipman.Server.Domain.Enums;
+using shipman.Tests.TestUtils;
 
 namespace shipman.Tests.Unit.Services;
 
@@ -17,7 +18,7 @@ public class ShipmentServiceTests
         await db.SaveChangesAsync();
 
         var service = ServiceDataFactory.CreateService(db);
-        var dto = ServiceDataFactory.CreateEventDto(ShipmentEventType.PickedUp);
+        var dto = DtoFactory.CreateEventDto(ShipmentEventType.PickedUp);
 
         var result = await service.AddEventAsync(shipmentId, dto);
 
@@ -32,7 +33,6 @@ public class ShipmentServiceTests
         await using var db = InMemoryDbContextFactory.Create();
 
         var shipmentId = Guid.NewGuid();
-
         var events = new List<ShipmentEvent>
         {
             ServiceDataFactory.CreateEvent(ShipmentEventType.PickedUp, shipmentId)
@@ -44,7 +44,7 @@ public class ShipmentServiceTests
         await db.SaveChangesAsync();
 
         var service = ServiceDataFactory.CreateService(db);
-        var dto = ServiceDataFactory.CreateEventDto(
+        var dto = DtoFactory.CreateEventDto(
             ShipmentEventType.Cancelled,
             description: "Cancelled by sender"
         );
@@ -62,7 +62,7 @@ public class ShipmentServiceTests
         await using var db = InMemoryDbContextFactory.Create();
         var service = ServiceDataFactory.CreateService(db);
 
-        var dto = ServiceDataFactory.CreateEventDto(ShipmentEventType.PickedUp);
+        var dto = DtoFactory.CreateEventDto(ShipmentEventType.PickedUp);
 
         var result = await service.AddEventAsync(Guid.NewGuid(), dto);
 
@@ -105,7 +105,6 @@ public class ShipmentServiceTests
         await using var db = InMemoryDbContextFactory.Create();
 
         var shipmentId = Guid.NewGuid();
-
         var events = new List<ShipmentEvent>
         {
             ServiceDataFactory.CreateEvent(ShipmentEventType.PickedUp, shipmentId)
@@ -117,7 +116,6 @@ public class ShipmentServiceTests
         await db.SaveChangesAsync();
 
         var service = ServiceDataFactory.CreateService(db);
-
         var result = await service.GetByIdAsync(shipmentId);
 
         Assert.NotNull(result);
@@ -132,15 +130,8 @@ public class ShipmentServiceTests
         await using var db = InMemoryDbContextFactory.Create();
         var service = ServiceDataFactory.CreateService(db);
 
-        var dto = new CreateShipmentDto
-        {
-            Sender = "Alice",
-            Receiver = "Bob",
-            Origin = "A",
-            Destination = "B",
-            Weight = 2.5m,
-            ServiceType = ServiceType.Standard
-        };
+        var dto = DtoFactory.CreateShipment();
+
 
         var result = await service.CreateShipmentAsync(dto);
 

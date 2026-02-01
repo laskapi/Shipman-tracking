@@ -7,8 +7,7 @@ public class Shipment
     public Guid Id { get; set; }
     public string TrackingNumber { get; set; } = default!;
     public string Sender { get; set; } = default!;
-    public string Receiver { get; set; } = default!;
-
+    public Receiver Receiver { get; set; } = default!;
     public string Origin { get; set; } = default!;
     public string Destination { get; set; } = default!;
     public decimal Weight { get; set; }

@@ -19,8 +19,10 @@ builder.Services.AddOpenApi();
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite(builder.Configuration.GetConnectionString("Default")));
 
 builder.Services.AddScoped<IShipmentService, ShipmentService>();
-
 builder.Services.AddScoped<IAppDbContext>(provider => provider.GetRequiredService<AppDbContext>());
+builder.Services.AddScoped<IMailSender, FakeMailSender>(); // or SmtpMailSender for now
+builder.Services.AddScoped<INotificationService, NotificationService>();
+
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
 {

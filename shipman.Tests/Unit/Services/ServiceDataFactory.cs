@@ -1,7 +1,9 @@
-﻿using shipman.Server.Application.Services;
+﻿using shipman.Server.Application.Interfaces;
+using shipman.Server.Application.Services;
 using shipman.Server.Data;
 using shipman.Server.Domain.Entities;
 using shipman.Server.Domain.Enums;
+using System.Reflection;
 
 namespace shipman.Tests.Unit.Services;
 
@@ -17,7 +19,7 @@ public static class ServiceDataFactory
             Id = id ?? Guid.NewGuid(),
             TrackingNumber = "TN123",
             Sender = "Sender",
-            Receiver = "Receiver",
+            Receiver = new Receiver("Receiver Name", "receiver@example.com", "+48 600 000 000"),
             Origin = "A",
             Destination = "B",
             Weight = 1,
@@ -42,23 +44,12 @@ public static class ServiceDataFactory
         };
     }
 
-    public static ShipmentService CreateService(IAppDbContext db)
+    public static ShipmentService CreateService(IAppDbContext db, INotificationService? notifications = null)
     {
-        return new ShipmentService(db);
+        notifications ??= NotificationMockFactory.CreateMock().Object;
+        return new ShipmentService(db, notifications);
     }
 
-    public static AddShipmentEventDto CreateEventDto(
-    ShipmentEventType type,
-    string? location = "A",
-    string? description = null)
-    {
-        return new AddShipmentEventDto
-        {
-            EventType = type,
-            Location = location,
-            Description = description ?? type.ToString()
-        };
-    }
-
-
+  
+   
 }

@@ -20,15 +20,7 @@ public class ShipmentsControllerTests
     [Fact]
     public async Task CreateShipment_ReturnsCreatedAndValidDto()
     {
-        var dto = new CreateShipmentDto
-        {
-            Sender = "Alice",
-            Receiver = "Bob",
-            Origin = "Berlin",
-            Destination = "Paris",
-            Weight = 2.5m,
-            ServiceType = ServiceType.Standard
-        };
+        var dto = DtoFactory.CreateShipment();
 
         var response = await _client.PostAsJsonAsync("/api/shipments", dto);
 
@@ -44,15 +36,7 @@ public class ShipmentsControllerTests
     [Fact]
     public async Task GetShipmentById_ReturnsShipment()
     {
-        var dto = new CreateShipmentDto
-        {
-            Sender = "Alice",
-            Receiver = "Bob",
-            Origin = "Berlin",
-            Destination = "Paris",
-            Weight = 2.5m,
-            ServiceType = ServiceType.Standard
-        };
+        var dto = DtoFactory.CreateShipment();
 
         var createResponse = await _client.PostAsJsonAsync("/api/shipments", dto);
         var created = await createResponse.Content.ReadFromJsonAsync<ShipmentDetailsDto>(TestJson.Options);
@@ -66,25 +50,8 @@ public class ShipmentsControllerTests
     [Fact]
     public async Task GetAllShipments_ReturnsPagedResultWithItemsList()
     {
-        var dto1 = new CreateShipmentDto
-        {
-            Sender = "A",
-            Receiver = "B",
-            Origin = "X",
-            Destination = "Y",
-            Weight = 1,
-            ServiceType = ServiceType.Standard
-        };
-
-        var dto2 = new CreateShipmentDto
-        {
-            Sender = "C",
-            Receiver = "D",
-            Origin = "M",
-            Destination = "N",
-            Weight = 2,
-            ServiceType = ServiceType.Express
-        };
+        var dto1 = DtoFactory.CreateShipment();
+        var dto2 = DtoFactory.CreateShipment("Bob");
 
         await _client.PostAsJsonAsync("/api/shipments", dto1);
         await _client.PostAsJsonAsync("/api/shipments", dto2);
@@ -100,16 +67,8 @@ public class ShipmentsControllerTests
     [Fact]
     public async Task UpdateShipment_UpdatesSelectedFields()
     {
-        var createDto = new CreateShipmentDto
-        {
-            Sender = "Alice",
-            Receiver = "Bob",
-            Origin = "Berlin",
-            Destination = "Paris",
-            Weight = 2.5m,
-            ServiceType = ServiceType.Standard
-        };
-
+        var createDto = DtoFactory.CreateShipment(); 
+               
         var createResponse = await _client.PostAsJsonAsync("/api/shipments", createDto);
         var created = await createResponse.Content.ReadFromJsonAsync<ShipmentDetailsDto>(TestJson.Options);
         var updateDto = new UpdateShipmentDto
@@ -131,15 +90,7 @@ public class ShipmentsControllerTests
     [Fact]
     public async Task DeleteShipment_RemovesShipment()
     {
-        var dto = new CreateShipmentDto
-        {
-            Sender = "Alice",
-            Receiver = "Bob",
-            Origin = "Berlin",
-            Destination = "Paris",
-            Weight = 2.5m,
-            ServiceType = ServiceType.Standard
-        };
+        var dto = DtoFactory.CreateShipment();
 
         var createResponse = await _client.PostAsJsonAsync("/api/shipments", dto);
         var created = await createResponse.Content.ReadFromJsonAsync<ShipmentDetailsDto>(TestJson.Options);
@@ -147,14 +98,9 @@ public class ShipmentsControllerTests
         var deleteResponse = await _client.DeleteAsync($"/api/shipments/{created!.Id}");
         Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
 
-        // Verify it's gone
         var getResponse = await _client.GetAsync($"/api/shipments/{created.Id}");
         Assert.Equal(HttpStatusCode.NotFound, getResponse.StatusCode);
     }
-
-
-
-
 
     public void Dispose()
     {

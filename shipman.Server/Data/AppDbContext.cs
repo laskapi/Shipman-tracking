@@ -3,7 +3,7 @@ using shipman.Server.Domain.Entities;
 
 namespace shipman.Server.Data;
 
-public class AppDbContext : DbContext,IAppDbContext
+public class AppDbContext : DbContext, IAppDbContext
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
@@ -15,11 +15,31 @@ public class AppDbContext : DbContext,IAppDbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<Shipment>()
-            .HasMany(s => s.Events)
-            .WithOne(e => e.Shipment)
-            .HasForeignKey(e => e.ShipmentId);
+        modelBuilder.Entity<Shipment>(entity =>
+        {
+            entity.HasMany(s => s.Events)
+                  .WithOne(e => e.Shipment)
+                  .HasForeignKey(e => e.ShipmentId);
+
+            entity.OwnsOne(s => s.Receiver, r =>
+            {
+                r.Property(x => x.Name)
+                    .HasColumnName("ReceiverName")
+                    .IsRequired();
+
+                r.Property(x => x.Email)
+                    .HasColumnName("ReceiverEmail")
+                    .IsRequired();
+
+                r.Property(x => x.Phone)
+                    .HasColumnName("ReceiverPhone")
+                    .IsRequired();
+            });
+        });
+
     }
 
-
 }
+
+
+
