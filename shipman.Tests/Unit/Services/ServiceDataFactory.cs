@@ -1,8 +1,10 @@
-﻿using shipman.Server.Application.Interfaces;
+﻿using Microsoft.Extensions.Logging.Abstractions;
+using shipman.Server.Application.Interfaces;
 using shipman.Server.Application.Services;
 using shipman.Server.Data;
 using shipman.Server.Domain.Entities;
 using shipman.Server.Domain.Enums;
+using shipman.Tests.Unit.Fakes;
 using System.Reflection;
 
 namespace shipman.Tests.Unit.Services;
@@ -44,12 +46,17 @@ public static class ServiceDataFactory
         };
     }
 
-    public static ShipmentService CreateService(IAppDbContext db, INotificationService? notifications = null)
+    public static ShipmentService CreateService(
+        IAppDbContext db,
+        INotificationService? notifications = null)
     {
-        notifications ??= NotificationMockFactory.CreateMock().Object;
-        return new ShipmentService(db, notifications);
+        var logger = NullLogger<ShipmentService>.Instance;
+        notifications ??= new FakeNotificationService();
+
+        return new ShipmentService(logger, db, notifications);
     }
 
-  
-   
+
+
+
 }

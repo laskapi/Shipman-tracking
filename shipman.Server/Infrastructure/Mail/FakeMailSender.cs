@@ -4,7 +4,7 @@ public class FakeMailSender : IMailSender
 {
     public Task SendAsync(string to, string subject, string body)
     {
-        Console.WriteLine($"Email to {to}: {subject}");
+        // Simulate sending email (no logging here — decorator handles it)
         return Task.CompletedTask;
     }
 }

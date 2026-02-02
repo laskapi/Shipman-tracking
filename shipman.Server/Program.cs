@@ -1,17 +1,17 @@
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using shipman.Server.Application.Interfaces;
 using shipman.Server.Application.Services;
 using shipman.Server.Data;
-using System.Security.Claims;
+using shipman.Server.Infrastructure.Mail;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
 /*builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("ConnectionString")));
@@ -20,7 +20,13 @@ builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite(builder
 
 builder.Services.AddScoped<IShipmentService, ShipmentService>();
 builder.Services.AddScoped<IAppDbContext>(provider => provider.GetRequiredService<AppDbContext>());
-builder.Services.AddScoped<IMailSender, FakeMailSender>(); // or SmtpMailSender for now
+builder.Services.AddScoped<FakeMailSender>();
+builder.Services.AddScoped<IMailSender>(sp =>
+{
+    var logger = sp.GetRequiredService<ILogger<MailSenderLoggingDecorator>>();
+    var inner = sp.GetRequiredService<FakeMailSender>();
+    return new MailSenderLoggingDecorator(logger, inner);
+});
 builder.Services.AddScoped<INotificationService, NotificationService>();
 
 
@@ -61,25 +67,6 @@ using (var scope = app.Services.CreateScope())
     DbSeeder.Seed(db);
 }
 
-
-/*builder.Services.AddIdentityApiEndpoints<AppUser>()
-    .AddEntityFrameworkStores<AppDbContext>();
-*/
-
-/*
-app.MapPost("/logout", async (SignInManager<AppUser> signInManager) =>
-    {
-        await signInManager.SignOutAsync();
-        return Results.Ok;
-    }).RequireAuthorization();
-
-app.MapGet("/getUserName", (ClaimsPrincipal user) =>
-{
-    var name = user.FindFirstValue(ClaimTypes.Name);
-    return Results.Json(new { Name = name });
-}).RequireAuthorization();
-*/
-
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -89,16 +76,30 @@ if (app.Environment.IsDevelopment())
         options.SwaggerEndpoint("/openapi/v1.json", "OpenAPI V1");
     });
 }
+app.UseExceptionHandler(errorApp =>
+{
+    errorApp.Run(async context =>
+    {
+        var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
+        var exception = context.Features.Get<IExceptionHandlerFeature>()?.Error;
+
+        logger.LogError(exception, "Unhandled exception occurred");
+
+        context.Response.StatusCode = 500;
+        context.Response.ContentType = "application/json";
+
+        await context.Response.WriteAsJsonAsync(new
+        {
+            error = "An unexpected error occurred. Please try again later."
+        });
+    });
+});
 
 app.UseCors();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-
-//app.UseDefaultFiles();
-//app.MapStaticAssets();
-//app.MapIdentityApi<AppUser>();
 app.UseHttpsRedirection();
 app.MapFallbackToFile("/index.html");
 app.Run();
