@@ -15,18 +15,27 @@ namespace shipman.Server.Api.Controllers;
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
+    private readonly ILogger<AuthController> _logger;
     private readonly AppDbContext _db;
 
-    public AuthController(AppDbContext db)
+    public AuthController(
+        ILogger<AuthController> logger,
+        AppDbContext db)
     {
+        _logger = logger;
         _db = db;
     }
 
     [HttpPost("register")]
     public async Task<IActionResult> Register(RegisterDto dto)
     {
+        _logger.LogInformation("Registration attempt for email {Email}", dto.Email);
+
         if (await _db.Users.AnyAsync(u => u.Email == dto.Email))
+        {
+            _logger.LogWarning("Registration failed: user with email {Email} already exists", dto.Email);
             return BadRequest("User already exists");
+        }
 
         CreatePasswordHash(dto.Password, out var hash, out var salt);
 
@@ -41,15 +50,23 @@ public class AuthController : ControllerBase
         _db.Users.Add(user);
         await _db.SaveChangesAsync();
 
+        _logger.LogInformation("User {Email} registered successfully", dto.Email);
+
         return Ok();
     }
 
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginDto dto)
     {
+        _logger.LogInformation("Login attempt for email {Email}", dto.Email);
+
         var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
+
         if (user == null || !VerifyPassword(dto.Password, user.PasswordHash, user.PasswordSalt))
+        {
+            _logger.LogWarning("Login failed for email {Email}", dto.Email);
             return Unauthorized("Invalid credentials");
+        }
 
         var claims = new List<Claim>
         {
@@ -62,21 +79,33 @@ public class AuthController : ControllerBase
 
         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
+        _logger.LogInformation("User {Email} logged in successfully", dto.Email);
+
         return Ok(new { email = user.Email });
     }
 
     [HttpPost("logout")]
     public async Task<IActionResult> Logout()
     {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        _logger.LogInformation("User {UserId} logged out", userId);
+
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
         return Ok();
     }
 
     [HttpGet("me")]
     public IActionResult Me()
     {
+        _logger.LogInformation("Accessing /me endpoint");
+
         if (!User.Identity?.IsAuthenticated ?? true)
+        {
+            _logger.LogWarning("Unauthorized /me access attempt");
             return Unauthorized();
+        }
 
         return Ok(new
         {

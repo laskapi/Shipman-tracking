@@ -17,9 +17,8 @@ namespace shipman.Server.Application.Services
             return _mail.SendAsync(
                 shipment.Receiver.Email,
                 "Shipment cancelled",
-                $"Your shipment {shipment.TrackingNumber} has been cancelled"
-                );
-
+                $"Your shipment {shipment.TrackingNumber} has been cancelled."
+            );
         }
 
         public Task ShipmentCreatedAsync(Shipment shipment)
@@ -28,7 +27,7 @@ namespace shipman.Server.Application.Services
                 shipment.Receiver.Email,
                 "Shipment created",
                 $"Your shipment {shipment.TrackingNumber} has been created."
-                );
+            );
         }
 
         public Task ShipmentDeliveredAsync(Shipment shipment)
@@ -37,7 +36,7 @@ namespace shipman.Server.Application.Services
                 shipment.Receiver.Email,
                 "Shipment delivered",
                 $"Your shipment {shipment.TrackingNumber} has been delivered."
-                );
+            );
         }
     }
 }

@@ -7,20 +7,26 @@ using shipman.Server.Domain.Enums;
 using shipman.Server.Infrastructure.Extensions;
 using System.Reflection;
 
-namespace shipman.Server.Application.Services;
-
 public class ShipmentService : IShipmentService
 {
+    private readonly ILogger<ShipmentService> _logger;
     private readonly IAppDbContext _db;
     private readonly INotificationService _notifications;
-    public ShipmentService(IAppDbContext db, INotificationService notifications)
+
+    public ShipmentService(
+        ILogger<ShipmentService> logger,
+        IAppDbContext db,
+        INotificationService notifications)
     {
+        _logger = logger;
         _db = db;
         _notifications = notifications;
     }
 
     public async Task<Shipment> CreateShipmentAsync(CreateShipmentDto request)
     {
+        _logger.LogInformation("Creating new shipment for receiver {Receiver}", request.ReceiverName);
+
         var shipment = new Shipment
         {
             Id = Guid.NewGuid(),
@@ -29,7 +35,7 @@ public class ShipmentService : IShipmentService
             Receiver = new Receiver(
                 request.ReceiverName,
                 request.ReceiverEmail,
-            request.ReceiverPhone
+                request.ReceiverPhone
             ),
             Origin = request.Origin,
             Destination = request.Destination,
@@ -52,25 +58,29 @@ public class ShipmentService : IShipmentService
         }
         catch (InvalidOperationException ex)
         {
-            throw new InvalidOperationException($"Failed to create shipment: {ex.Message}");
+            _logger.LogError(ex, "Failed to add Created event to shipment {ShipmentId}", shipment.Id);
+            throw;
         }
 
         _db.Shipments.Add(shipment);
         await _db.SaveChangesAsync();
+
+        _logger.LogInformation("Shipment {ShipmentId} created successfully", shipment.Id);
+
         await _notifications.ShipmentCreatedAsync(shipment);
         return shipment;
     }
 
     public async Task<PagedResultDto<Shipment>> GetAllAsync(
-     int page,
-     int pageSize,
-     ShipmentFilterDto filter,
-     string sortBy,
-     string direction)
+        int page,
+        int pageSize,
+        ShipmentFilterDto filter,
+        string sortBy,
+        string direction)
     {
-        var query = _db.Shipments
-            .AsNoTracking()
-            .AsQueryable();
+        _logger.LogInformation("Fetching shipments page {Page} with filter {Filter}", page, filter);
+
+        var query = _db.Shipments.AsNoTracking().AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(filter.TrackingNumber))
             query = query.Where(s => s.TrackingNumber.Contains(filter.TrackingNumber));
@@ -89,6 +99,7 @@ public class ShipmentService : IShipmentService
         }
         else
         {
+            _logger.LogWarning("Invalid sort property {SortBy}, falling back to UpdatedAt", sortBy);
             query = asc
                 ? query.OrderBy(s => s.UpdatedAt)
                 : query.OrderByDescending(s => s.UpdatedAt);
@@ -113,19 +124,27 @@ public class ShipmentService : IShipmentService
 
     public async Task<Shipment?> GetByIdAsync(Guid id)
     {
+        _logger.LogInformation("Fetching shipment {ShipmentId}", id);
+
         return await _db.Shipments
             .AsNoTracking()
             .Include(s => s.Events)
             .FirstOrDefaultAsync(s => s.Id == id);
     }
+
     public async Task<Shipment?> AddEventAsync(Guid id, AddShipmentEventDto dto)
     {
+        _logger.LogInformation("Adding event {EventType} to shipment {ShipmentId}", dto.EventType, id);
+
         var shipment = await _db.Shipments
             .Include(s => s.Events)
             .FirstOrDefaultAsync(s => s.Id == id);
 
         if (shipment == null)
+        {
+            _logger.LogWarning("Shipment {ShipmentId} not found when adding event {EventType}", id, dto.EventType);
             return null;
+        }
 
         var evt = new ShipmentEvent
         {
@@ -143,11 +162,14 @@ public class ShipmentService : IShipmentService
         }
         catch (InvalidOperationException ex)
         {
-            throw new InvalidOperationException(ex.Message);
+            _logger.LogError(ex, "Invalid event sequence for shipment {ShipmentId}", id);
+            throw;
         }
 
         _db.ShipmentEvents.Add(evt);
         await _db.SaveChangesAsync();
+
+        _logger.LogInformation("Event {EventType} added to shipment {ShipmentId}", dto.EventType, id);
 
         switch (dto.EventType)
         {
@@ -159,22 +181,29 @@ public class ShipmentService : IShipmentService
                 await _notifications.ShipmentCancelledAsync(shipment);
                 break;
         }
+
         return shipment;
     }
 
     public async Task<Shipment?> UpdateShipmentAsync(Guid id, UpdateShipmentDto dto)
     {
+        _logger.LogInformation("Updating shipment {ShipmentId}", id);
+
         var shipment = await _db.Shipments
             .Include(s => s.Events)
             .FirstOrDefaultAsync(s => s.Id == id);
 
         if (shipment == null)
+        {
+            _logger.LogWarning("Shipment {ShipmentId} not found for update", id);
             return null;
+        }
 
-        // Domain rules: only allow updates before shipment is delivered or cancelled
-        if (shipment.Status == ShipmentStatus.Delivered ||
-            shipment.Status == ShipmentStatus.Cancelled)
+        if (shipment.Status is ShipmentStatus.Delivered or ShipmentStatus.Cancelled)
+        {
+            _logger.LogWarning("Attempt to update completed shipment {ShipmentId}", id);
             throw new InvalidOperationException("Cannot update a completed shipment.");
+        }
 
         if (dto.Destination != null)
             shipment.Destination = dto.Destination;
@@ -186,20 +215,31 @@ public class ShipmentService : IShipmentService
             shipment.ServiceType = dto.ServiceType.Value;
 
         await _db.SaveChangesAsync();
+
+        _logger.LogInformation("Shipment {ShipmentId} updated successfully", id);
+
         return shipment;
     }
+
     public async Task<bool> DeleteShipmentAsync(Guid id)
     {
+        _logger.LogInformation("Deleting shipment {ShipmentId}", id);
+
         var shipment = await _db.Shipments
             .Include(s => s.Events)
             .FirstOrDefaultAsync(s => s.Id == id);
 
         if (shipment == null)
+        {
+            _logger.LogWarning("Shipment {ShipmentId} not found for deletion", id);
             return false;
+        }
 
         _db.Shipments.Remove(shipment);
         await _db.SaveChangesAsync();
+
+        _logger.LogInformation("Shipment {ShipmentId} deleted", id);
+
         return true;
     }
-
 }
