@@ -1,27 +1,14 @@
-﻿using shipman.Server.Domain.Entities;
-using shipman.Server.Domain.Enums;
+﻿using shipman.Server.Domain.Enums;
 
 namespace shipman.Tests.Unit.Domain;
 
 public class ShipmentTests
 {
-    private Shipment CreateShipment()
-    {
-        return new Shipment
-        {
-            Id = Guid.NewGuid(),
-            Origin = "A",
-            Destination = "B",
-            Sender = "Sender",
-            Receiver = "Receiver",
-            Weight = 1,
-            ServiceType = ServiceType.Standard
-        };
-    }
+  
     [Fact]
     public void CannotDeliverBeforePickup()
     {
-        var shipment = CreateShipment();
+        var shipment = DomainDataFactory.CreateShipment();
 
         var deliveredEvent = new ShipmentEvent
         {
@@ -37,8 +24,8 @@ public class ShipmentTests
     [Fact]
     public void CannotPickupTwice()
     {
-        var shipment = CreateShipment();
-
+        var shipment = DomainDataFactory.CreateShipment();
+        
         shipment.AddEvent(new ShipmentEvent
         {
             Id = Guid.NewGuid(),
@@ -60,7 +47,7 @@ public class ShipmentTests
     [Fact]
     public void CannotCancelAfterDelivered()
     {
-        var shipment = CreateShipment();
+        var shipment = DomainDataFactory.CreateShipment();
 
         shipment.AddEvent(new ShipmentEvent { Id = Guid.NewGuid(), EventType = ShipmentEventType.PickedUp, Timestamp = DateTime.UtcNow });
         shipment.AddEvent(new ShipmentEvent { Id = Guid.NewGuid(), EventType = ShipmentEventType.InTransit, Timestamp = DateTime.UtcNow });
@@ -83,7 +70,8 @@ public class ShipmentTests
     [Fact]
     public void CannotAddEventsAfterCancellation()
     {
-        var shipment = CreateShipment();
+        var shipment = DomainDataFactory.CreateShipment();
+
         shipment.AddEvent(new ShipmentEvent
         {
             Id = Guid.NewGuid(),
@@ -103,7 +91,7 @@ public class ShipmentTests
     [Fact]
     public void StatusUpdatesCorrectlyBasedOnEventType()
     {
-        var shipment = CreateShipment();
+        var shipment = DomainDataFactory.CreateShipment();
 
         shipment.AddEvent(new ShipmentEvent
         {
@@ -117,7 +105,7 @@ public class ShipmentTests
     [Fact]
     public void ValidEventSequence_CompletesWithoutErrors()
     {
-        var shipment = CreateShipment();
+        var shipment = DomainDataFactory.CreateShipment();
 
         var events = new[]
         {

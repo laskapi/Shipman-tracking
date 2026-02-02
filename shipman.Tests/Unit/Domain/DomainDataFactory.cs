@@ -3,7 +3,7 @@ using shipman.Server.Domain.Enums;
 
 namespace shipman.Tests.Unit.Domain
 {
-    internal class DomainTestFactory
+    internal class DomainDataFactory
     {
 
         public static Shipment CreateShipment()
@@ -14,7 +14,7 @@ namespace shipman.Tests.Unit.Domain
                 Origin = "A",
                 Destination = "B",
                 Sender = "Sender",
-                Receiver = "Receiver",
+                Receiver = new Receiver("Receiver Name", "receiver@example.com", "+48 600 000 000"),
                 Weight = 1,
                 ServiceType = ServiceType.Standard
             };

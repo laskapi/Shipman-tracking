@@ -12,9 +12,11 @@ namespace shipman.Server.Application.Services;
 public class ShipmentService : IShipmentService
 {
     private readonly IAppDbContext _db;
-    public ShipmentService(IAppDbContext db)
+    private readonly INotificationService _notifications;
+    public ShipmentService(IAppDbContext db, INotificationService notifications)
     {
         _db = db;
+        _notifications = notifications;
     }
 
     public async Task<Shipment> CreateShipmentAsync(CreateShipmentDto request)
@@ -24,7 +26,11 @@ public class ShipmentService : IShipmentService
             Id = Guid.NewGuid(),
             TrackingNumber = Guid.NewGuid().ToString("N")[..12].ToUpper(),
             Sender = request.Sender,
-            Receiver = request.Receiver,
+            Receiver = new Receiver(
+                request.ReceiverName,
+                request.ReceiverEmail,
+            request.ReceiverPhone
+            ),
             Origin = request.Origin,
             Destination = request.Destination,
             Weight = request.Weight,
@@ -51,7 +57,7 @@ public class ShipmentService : IShipmentService
 
         _db.Shipments.Add(shipment);
         await _db.SaveChangesAsync();
-
+        await _notifications.ShipmentCreatedAsync(shipment);
         return shipment;
     }
 
@@ -141,8 +147,18 @@ public class ShipmentService : IShipmentService
         }
 
         _db.ShipmentEvents.Add(evt);
-
         await _db.SaveChangesAsync();
+
+        switch (dto.EventType)
+        {
+            case ShipmentEventType.Delivered:
+                await _notifications.ShipmentDeliveredAsync(shipment);
+                break;
+
+            case ShipmentEventType.Cancelled:
+                await _notifications.ShipmentCancelledAsync(shipment);
+                break;
+        }
         return shipment;
     }
 
