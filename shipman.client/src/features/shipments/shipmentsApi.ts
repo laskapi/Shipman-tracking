@@ -1,4 +1,4 @@
-import type { PagedResult, Shipment, ShipmentDetails, ShipmentListItem, ShipmentsQueryParams } from "./types"
+import type { PagedResult, Shipment, ShipmentDetails, ShipmentListItem, ShipmentsQueryParams, ShipmentStatusDto } from "./types"
 import { api } from "@/services/api"
 export interface CreateShipmentRequest {
     trackingNumber: string
@@ -35,7 +35,7 @@ export const shipmentApi = api.injectEndpoints({
                 body: { status }
             })
         }),
-        getShipmentStatuses: builder.query<string[], void>({
+        getShipmentStatuses: builder.query<ShipmentStatusDto[], void>({
             query: () => "metadata/shipment-statuses"
         })
     })

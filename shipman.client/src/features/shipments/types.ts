@@ -44,7 +44,7 @@ export interface ShipmentsQueryParams {
     trackingNumber?: string
     status?: string
     sortBy?: string
-    direction?: "asc"|"desc"
+    direction?: "asc" | "desc"
 }
 export interface Shipment {
     id: string
@@ -53,4 +53,8 @@ export interface Shipment {
     receiver: string
     status: string
     createdAt: string
+}
+export interface ShipmentStatusDto {
+    value: string
+    label: string
 }

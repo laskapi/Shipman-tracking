@@ -72,42 +72,45 @@ public class ShipmentService : IShipmentService
     }
 
     public async Task<PagedResultDto<Shipment>> GetAllAsync(
-        int page,
-        int pageSize,
-        ShipmentFilterDto filter,
-        string sortBy,
-        string direction)
+     int page,
+     int pageSize,
+     ShipmentFilterDto filter,
+     string sortBy,
+     string direction)
     {
         _logger.LogInformation("Fetching shipments page {Page} with filter {Filter}", page, filter);
 
-        var query = _db.Shipments.AsNoTracking().AsQueryable();
+        var baseQuery = _db.Shipments.AsNoTracking().AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(filter.TrackingNumber))
-            query = query.Where(s => s.TrackingNumber.Contains(filter.TrackingNumber));
+            baseQuery = baseQuery.Where(s => s.TrackingNumber.Contains(filter.TrackingNumber));
 
         if (filter.Status.HasValue)
-            query = query.Where(s => s.Status == filter.Status.Value);
+            baseQuery = baseQuery.Where(s => s.Status == filter.Status.Value);
+
+        var totalCount = await baseQuery.CountAsync();
 
         bool asc = direction.Equals("asc", StringComparison.OrdinalIgnoreCase);
 
         var property = typeof(Shipment)
             .GetProperty(sortBy, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
 
+        IQueryable<Shipment> sortedQuery;
+
         if (property != null)
         {
-            query = query.OrderByProperty(property.Name, asc);
+            sortedQuery = baseQuery.OrderByProperty(property.Name, asc);
         }
         else
         {
             _logger.LogWarning("Invalid sort property {SortBy}, falling back to UpdatedAt", sortBy);
-            query = asc
-                ? query.OrderBy(s => s.UpdatedAt)
-                : query.OrderByDescending(s => s.UpdatedAt);
+
+            sortedQuery = asc
+                ? baseQuery.OrderBy(s => s.UpdatedAt)
+                : baseQuery.OrderByDescending(s => s.UpdatedAt);
         }
 
-        var totalCount = await query.CountAsync();
-
-        var items = await query
+        var items = await sortedQuery
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
@@ -121,6 +124,7 @@ public class ShipmentService : IShipmentService
             TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize)
         };
     }
+
 
     public async Task<Shipment?> GetByIdAsync(Guid id)
     {

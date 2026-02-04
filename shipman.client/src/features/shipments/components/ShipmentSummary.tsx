@@ -1,6 +1,6 @@
 import { Paper, Typography, Grid } from "@mui/material";
 import StatusBadge from "@/components/StatusBadge";
-import type { ShipmentDetails } from "@/types/shipment";
+import type { ShipmentDetails } from "@/features/shipments/types";
 
 export default function ShipmentSummary({ shipment }: { shipment: ShipmentDetails }) {
     return (

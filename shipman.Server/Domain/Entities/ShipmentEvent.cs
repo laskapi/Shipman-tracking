@@ -7,7 +7,7 @@ public class ShipmentEvent
     public Guid ShipmentId { get; set; }
     public Shipment Shipment { get; set; } = default!;
     public DateTime Timestamp { get; set; }
-    public ShipmentEventType EventType { get; set; } = default!;   // structured
-    public string Location { get; set; } = default!;    // human-readable location
-    public string Description { get; set; } = default!; // human-readable detail
+    public ShipmentEventType EventType { get; set; } = default!;
+    public string Location { get; set; } = default!;    
+    public string Description { get; set; } = default!; 
 }
