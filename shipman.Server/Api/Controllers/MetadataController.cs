@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using shipman.Server.Application.Dtos;
 using shipman.Server.Domain.Enums;
+using System.Text.RegularExpressions;
 
 namespace shipman.Server.Api.Controllers;
 
@@ -15,50 +17,56 @@ public class MetadataController : ControllerBase
     }
 
     [HttpGet("shipment-statuses")]
-    public IActionResult GetShipmentStatuses()
+    public ActionResult<IEnumerable<MetadataOptionDto>> GetShipmentStatuses()
     {
-        _logger.LogInformation("Fetching shipment statuses metadata");
-
-        var statuses = Enum.GetValues(typeof(ShipmentStatus))
-            .Cast<ShipmentStatus>()
-            .Select(s => new
-            {
-                value = s.ToString(),
-                label = s.ToString()
-            });
+        _logger.LogInformation("Fetching status types metadata");
+        var statuses = Enum.GetValues<ShipmentStatus>()
+            .Select(s => new MetadataOptionDto(
+                s.ToString(),
+                s.ToString()
+            ));
 
         return Ok(statuses);
     }
 
     [HttpGet("shipment-event-types")]
-    public IActionResult GetShipmentEventTypes()
+    public ActionResult<IEnumerable<MetadataOptionDto>> GetShipmentEventTypes()
     {
-        _logger.LogInformation("Fetching shipment event types metadata");
-
-        var events = Enum.GetValues(typeof(ShipmentEventType))
-            .Cast<ShipmentEventType>()
-            .Select(e => new
-            {
-                value = e.ToString(),
-                label = e.ToString()
-            });
+        _logger.LogInformation("Fetching event types metadata");
+        var events = Enum.GetValues<ShipmentEventType>()
+            .Select(e => new MetadataOptionDto(
+                e.ToString(),
+                ToLabel(e.ToString())
+            ));
 
         return Ok(events);
     }
 
+
+
     [HttpGet("service-types")]
-    public IActionResult GetServiceTypes()
+    public ActionResult<IEnumerable<MetadataOptionDto>> GetServiceTypes()
     {
         _logger.LogInformation("Fetching service types metadata");
 
-        var types = Enum.GetValues(typeof(ServiceType))
-            .Cast<ServiceType>()
-            .Select(t => new
-            {
-                value = t.ToString(),
-                label = t.ToString()
-            });
+        var types = Enum.GetValues<ServiceType>()
+            .Select(t => new MetadataOptionDto(
+                t.ToString(),
+                t.ToString()
+            ));
 
         return Ok(types);
     }
+
+    private string ToLabel(string input)
+    {
+        if (string.IsNullOrWhiteSpace(input))
+            return input;
+
+        var spaced = Regex.Replace(input, "([A-Z])", " $1").Trim();
+
+        return char.ToUpper(spaced[0]) + spaced.Substring(1).ToLower();
+    }
+
+
 }

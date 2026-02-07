@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using shipman.Server.Application.Dtos;
+using shipman.Server.Application.Dtos.Auth;
 
 namespace shipman.Server.Application.Validators;
 public class LoginDtoValidator : AbstractValidator<LoginDto>

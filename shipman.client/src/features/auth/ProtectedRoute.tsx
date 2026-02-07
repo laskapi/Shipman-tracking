@@ -1,17 +1,13 @@
-import type { ReactNode } from "react"
 import { useAppSelector } from "@/app/storeHooks"
-import { Navigate } from "react-router-dom"
+import { Navigate, Outlet } from "react-router-dom"
 
-interface ProtectedRouteNodes {
-    children: ReactNode
-}
-export default function ProtectedRoute({ children }: ProtectedRouteNodes) {
+export default function ProtectedRoute() {
     const isAuthenticated = useAppSelector(state => state.auth.isAuthenticated)
 
-    if (!isAuthenticated) return <Navigate to="/login" />
+    if (!isAuthenticated) {
+        return <Navigate to="/login" replace />;
+    }
 
-    return children
+    return <Outlet />;
 }
-
-
 

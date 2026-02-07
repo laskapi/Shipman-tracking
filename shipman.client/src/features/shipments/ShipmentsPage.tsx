@@ -31,7 +31,7 @@ export default function ShipmentsPage() {
     }
 
 
-    if (isLoading) return <p>Loading shipments..</p>
+    if (!data) return <p>Loading shipments..</p>
     if (isError) return <p>Failed to load shipments</p>
 
     return (<>
@@ -80,10 +80,11 @@ export default function ShipmentsPage() {
                     }}
                     sortModel={sortModel}
                     onSortModelChange={(model) => setSortModel(model)}
+                    pageSizeOptions={[5, 10, 20, 50]}
                     columns={shipmentsColumns}
                     getRowId={(row) => row.id}
                     onRowClick={handleRowClick}
-                />
+                />                               
             </div>
         </Box>
     </>

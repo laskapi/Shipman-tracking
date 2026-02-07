@@ -1,7 +1,10 @@
 export interface ShipmentEvent {
     timestamp: string;
+    eventType: string;
+    location: string;
     description: string;
 }
+
 
 export interface ShipmentDetails {
     id: string;
@@ -44,7 +47,7 @@ export interface ShipmentsQueryParams {
     trackingNumber?: string
     status?: string
     sortBy?: string
-    direction?: "asc"|"desc"
+    direction?: "asc" | "desc"
 }
 export interface Shipment {
     id: string
@@ -53,4 +56,8 @@ export interface Shipment {
     receiver: string
     status: string
     createdAt: string
+}
+export interface MetadataOptionDto {
+    value: string
+    label: string
 }

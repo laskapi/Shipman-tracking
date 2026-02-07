@@ -1,8 +1,9 @@
 import { Button, TextField, MenuItem, Paper, FormControl, InputLabel, Select } from "@mui/material"
 import ClearIcon from "@mui/icons-material/Clear"
 import RefreshIcon from "@mui/icons-material/Refresh"
+import type { MetadataOptionDto } from "../types"
 interface Props {
-    statuses: string[]
+    statuses: MetadataOptionDto[]
     statusFilter: string
     setStatusFilter: (value: string) => void
     search: string
@@ -41,14 +42,14 @@ export function ShipmentsToolbar({
                     onChange={(e) => setStatusFilter(e.target.value)}
                     displayEmpty
                     renderValue={(value: string) =>
-                        value === "" ? "All statuses" : value
+                        value === "" ? "All statuses" : statuses.find(s=>s.value===value)?.label
                     }
                 >
                     <MenuItem value="">All statuses</MenuItem>
 
                     {statuses.map((s) => (
-                        <MenuItem key={s} value={s}>
-                            {s}
+                        <MenuItem key={s.value} value={s.value}>
+                            {s.label}
                         </MenuItem>
                     ))}
                 </Select>

@@ -1,5 +1,6 @@
 ﻿using shipman.Server.Domain.Enums;
-using shipman.Server.Infrastructure.Extensions;
+using shipman.Server.Domain.Extensions;
+
 namespace shipman.Server.Domain.Entities;
 
 public class Shipment

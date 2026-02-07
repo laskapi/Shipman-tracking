@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using shipman.Server.Application.Dtos;
-using shipman.Server.Application.DTOs;
+using shipman.Server.Application.Dtos.Shipments;
 using shipman.Server.Application.Interfaces;
 using shipman.Server.Application.Mappings;
 using shipman.Server.Domain.Enums;
@@ -98,12 +98,7 @@ public class ShipmentsController : ControllerBase
     {
         _logger.LogInformation("Cancelling shipment {ShipmentId}", id);
 
-        var dto = new AddShipmentEventDto
-        {
-            EventType = ShipmentEventType.Cancelled,
-            Location = null,
-            Description = "Shipment cancelled"
-        };
+        var dto = new AddShipmentEventDto(ShipmentEventType.Cancelled);
 
         var shipment = await _service.AddEventAsync(id, dto);
 

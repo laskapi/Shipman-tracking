@@ -31,10 +31,14 @@ export const shipmentsColumns: GridColDef<ShipmentListItem>[] = [
         ),
     },
     {
-        field: "lastUpdated",
+        field: "updatedAt",
         headerName: "Last Updated",
         flex: 1,
         minWidth: 160,
-        valueGetter: (value) => new Date(value).toLocaleString(),
-    },
+
+        valueGetter: (value) =>
+            value ? new Date(value).toLocaleString() : "",
+    }
+
+,
 ]

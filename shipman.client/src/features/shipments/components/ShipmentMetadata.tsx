@@ -1,5 +1,6 @@
 import { Paper, Typography, Grid } from "@mui/material";
-import type { ShipmentDetails } from "@/types/shipment";
+import type { ShipmentDetails } from "@/features/shipments/types";
+import PanelHeader from "../../../components/PanelHeader";
 
 export default function ShipmentMetadata({ shipment }: { shipment: ShipmentDetails }) {
     return (
@@ -11,9 +12,7 @@ export default function ShipmentMetadata({ shipment }: { shipment: ShipmentDetai
                 mb: 3,
             }}
         >
-            <Typography variant="h6" mb={3} fontWeight={600}>
-                Additional Details
-            </Typography>
+            <PanelHeader>Metadata</PanelHeader>
 
             <Grid container spacing={2}>
                 <Grid size={{ xs: 12, sm: 6 }}>

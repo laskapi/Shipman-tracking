@@ -16,13 +16,11 @@
 
             string methodName = ascending ? "OrderBy" : "OrderByDescending";
 
-            var result = typeof(Queryable).GetMethods()
-                .First(m => m.Name == methodName
-                         && m.GetParameters().Length == 2)
-                .MakeGenericMethod(typeof(T), property.Type)
-                .Invoke(null, new object[] { source, lambda });
+            var method = typeof(Queryable).GetMethods()
+                .First(m => m.Name == methodName && m.GetParameters().Length == 2)
+                .MakeGenericMethod(typeof(T), property.Type);
 
-            return (IQueryable<T>)result!;
+            return (IQueryable<T>)method.Invoke(null, new object[] { source, lambda })!;
         }
     }
 }

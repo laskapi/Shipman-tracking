@@ -1,6 +1,7 @@
 import { Paper, Typography, Grid } from "@mui/material";
 import StatusBadge from "@/components/StatusBadge";
-import type { ShipmentDetails } from "@/types/shipment";
+import type { ShipmentDetails } from "@/features/shipments/types";
+import PanelHeader from "../../../components/PanelHeader";
 
 export default function ShipmentSummary({ shipment }: { shipment: ShipmentDetails }) {
     return (
@@ -12,9 +13,7 @@ export default function ShipmentSummary({ shipment }: { shipment: ShipmentDetail
                 mb: 3,
             }}
         >
-            <Typography variant="h6" mb={3} fontWeight={600}>
-                Shipment Summary
-            </Typography>
+            <PanelHeader>Summary</PanelHeader>
 
             <Grid container spacing={2}>
                 <DetailItem label="Tracking Number" value={shipment.trackingNumber} />
@@ -50,7 +49,7 @@ function DetailItem({ label, value }: { label: string; value: React.ReactNode })
             <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
                 {label}
             </Typography>
-            <Typography variant="body1" fontWeight={500}>
+            <Typography variant="body1" fontWeight={500} component="span">
                 {value}
             </Typography>
         </Grid>

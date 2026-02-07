@@ -1,4 +1,4 @@
-﻿namespace shipman.Server.Application.Dtos;
+﻿namespace shipman.Server.Application.Dtos.Shipments;
 
 using shipman.Server.Domain.Enums;
 

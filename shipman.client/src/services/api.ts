@@ -6,5 +6,6 @@ export const api = createApi({
         baseUrl: '/api/',
         credentials: 'include' // send cookies with every request
     }),
+    tagTypes: ["Shipment"],
     endpoints: () => ({})
 })

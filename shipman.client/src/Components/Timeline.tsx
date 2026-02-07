@@ -1,5 +1,5 @@
 import { Box, Typography } from "@mui/material";
-import type { ShipmentEvent } from "@/types/shipment";
+import type { ShipmentEvent } from "../features/shipments/types";
 
 interface TimelineProps {
     events: ShipmentEvent[];
@@ -18,21 +18,8 @@ export default function Timeline({ events }: TimelineProps) {
 
     return (
         <Box sx={{ position: "relative", pl: 3 }}>
-            {/* Vertical line */}
-            <Box
-                sx={{
-                    position: "absolute",
-                    left: 6,
-                    top: 0,
-                    bottom: 0,
-                    width: 2,
-                    bgcolor: "divider",
-                }}
-            />
-
             {sorted.map((event, index) => (
                 <Box key={event.timestamp + index} sx={{ mb: 4, position: "relative" }}>
-                    {/* Dot */}
                     <Box
                         sx={{
                             position: "absolute",
@@ -46,8 +33,6 @@ export default function Timeline({ events }: TimelineProps) {
                             zIndex: 1,
                         }}
                     />
-
-                    {/* Content */}
                     <Box sx={{ ml: 3 }}>
                         <Typography fontWeight={600}>
                             {new Date(event.timestamp).toLocaleString()}
