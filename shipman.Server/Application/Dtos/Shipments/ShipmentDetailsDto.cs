@@ -20,11 +20,3 @@ public class ShipmentDetailsDto
     public DateTime? EstimatedDelivery { get; set; }
     public List<ShipmentEventDto> Events { get; set; } = new();
 }
-
-public class ShipmentEventDto
-{
-    public DateTime Timestamp { get; set; }
-    public ShipmentEventType EventType { get; set; }
-    public string Location { get; set; } = default!;
-    public string Description { get; set; } = default!;
-}

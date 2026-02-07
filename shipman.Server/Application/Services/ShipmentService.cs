@@ -1,9 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using shipman.Server.Application.Dtos;
+using shipman.Server.Application.Dtos.Shipments;
 using shipman.Server.Application.Interfaces;
 using shipman.Server.Data;
 using shipman.Server.Domain.Entities;
 using shipman.Server.Domain.Enums;
+using shipman.Server.Domain.Extensions;
 using shipman.Server.Infrastructure.Extensions;
 using System.Reflection;
 
@@ -156,8 +158,8 @@ public class ShipmentService : IShipmentService
             ShipmentId = shipment.Id,
             Timestamp = DateTime.UtcNow,
             EventType = dto.EventType,
-            Location = dto.Location ?? shipment.Origin,
-            Description = dto.Description ?? dto.EventType.ToString()
+            Location = shipment.Origin,
+            Description = dto.EventType.ToDescription()
         };
 
         try
@@ -188,6 +190,7 @@ public class ShipmentService : IShipmentService
 
         return shipment;
     }
+
 
     public async Task<Shipment?> UpdateShipmentAsync(Guid id, UpdateShipmentDto dto)
     {

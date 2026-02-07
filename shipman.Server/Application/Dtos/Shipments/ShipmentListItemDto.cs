@@ -1,6 +1,6 @@
 ﻿using shipman.Server.Domain.Enums;
 
-namespace shipman.Server.Application.DTOs;
+namespace shipman.Server.Application.Dtos.Shipments;
 
 public class ShipmentListItemDto
 {

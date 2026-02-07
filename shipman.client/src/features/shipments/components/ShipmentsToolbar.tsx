@@ -1,9 +1,9 @@
 import { Button, TextField, MenuItem, Paper, FormControl, InputLabel, Select } from "@mui/material"
 import ClearIcon from "@mui/icons-material/Clear"
 import RefreshIcon from "@mui/icons-material/Refresh"
-import type { ShipmentStatusDto } from "../types"
+import type { MetadataOptionDto } from "../types"
 interface Props {
-    statuses: ShipmentStatusDto[]
+    statuses: MetadataOptionDto[]
     statusFilter: string
     setStatusFilter: (value: string) => void
     search: string

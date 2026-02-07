@@ -1,4 +1,4 @@
-﻿using shipman.Server.Application.DTOs;
+﻿using shipman.Server.Application.Dtos.Shipments;
 using shipman.Server.Domain.Entities;
 
 namespace shipman.Server.Application.Mappings;

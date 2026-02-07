@@ -7,7 +7,7 @@ using System.Security.Cryptography;
 using System.Text;
 using shipman.Server.Domain.Entities;
 using shipman.Server.Data;
-using shipman.Server.Application.Dtos;
+using shipman.Server.Application.Dtos.Auth;
 
 namespace shipman.Server.Api.Controllers;
 

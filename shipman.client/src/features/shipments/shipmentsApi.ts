@@ -1,4 +1,4 @@
-import type { PagedResult, Shipment, ShipmentDetails, ShipmentListItem, ShipmentsQueryParams, ShipmentStatusDto } from "./types"
+import type { PagedResult, Shipment, ShipmentDetails, ShipmentListItem, ShipmentsQueryParams, MetadataOptionDto } from "./types"
 import { api } from "@/services/api"
 export interface CreateShipmentRequest {
     trackingNumber: string
@@ -17,7 +17,8 @@ export const shipmentApi = api.injectEndpoints({
         }),
 
         getShipmentById: builder.query<ShipmentDetails, string>({
-            query: id => `shipments/${id}`
+            query: id => `shipments/${id}`,
+            providesTags: (result, error, id) => [{ type: "Shipment", id }]
         }),
 
         createShipment: builder.mutation<Shipment, CreateShipmentRequest>({
@@ -28,16 +29,26 @@ export const shipmentApi = api.injectEndpoints({
             })
         }),
 
-        updateShipmentStatus: builder.mutation<Shipment, UpdateShipmentStatusRequest>({
-            query: ({ id, status }) => ({
-                url: `shipments/${id}/status`,
-                method: "PUT",
-                body: { status }
-            })
+        addShipmentEvent: builder.mutation<ShipmentDetails, {
+            id: string;
+            eventType: string;
+        }>({
+            query: ({ id, eventType }) => ({
+                url: `shipments/${id}/events`,
+                method: "POST",
+                body: { eventType }
+            }),
+            invalidatesTags: (result, error, { id }) => [{ type: "Shipment", id }]
         }),
-        getShipmentStatuses: builder.query<ShipmentStatusDto[], void>({
+
+        getShipmentStatuses: builder.query<MetadataOptionDto[], void>({
             query: () => "metadata/shipment-statuses"
+        }),
+
+        getShipmentEventTypes: builder.query<MetadataOptionDto[], void>({
+            query: () => "metadata/shipment-event-types"
         })
+
     })
 })
 
@@ -45,6 +56,7 @@ export const {
     useGetShipmentsQuery,
     useGetShipmentByIdQuery,
     useCreateShipmentMutation,
-    useUpdateShipmentStatusMutation,
-    useGetShipmentStatusesQuery
+    useAddShipmentEventMutation,
+    useGetShipmentStatusesQuery,
+    useGetShipmentEventTypesQuery
 } = shipmentApi

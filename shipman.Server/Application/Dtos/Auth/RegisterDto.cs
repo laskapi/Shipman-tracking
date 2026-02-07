@@ -1,4 +1,4 @@
-﻿namespace shipman.Server.Application.Dtos;
+﻿namespace shipman.Server.Application.Dtos.Auth;
 
 public class RegisterDto
 {

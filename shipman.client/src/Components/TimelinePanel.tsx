@@ -1,21 +1,33 @@
-import { Paper, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import Timeline from "@/components/Timeline";
-import type { ShipmentEvent } from "@/types/shipment";
+import PanelHeader from "@/components/PanelHeader";
+import type { ShipmentEvent } from "../features/shipments/types";
 
 export default function TimelinePanel({ events }: { events: ShipmentEvent[] }) {
     return (
-        <Paper
-            elevation={1}
-            sx={{
-                p: 3,
-                borderRadius: 3,
-            }}
-        >
-            <Typography variant="h6" mb={3} fontWeight={600}>
-                Tracking History
-            </Typography>
+        <Box sx={{ display: "flex", flexDirection: "column" }}>
+            <PanelHeader>Tracking History</PanelHeader>
 
-            <Timeline events={events} />
-        </Paper>
+            <Box
+                sx={{
+                    overflowY: "auto",
+                    height: "40vh",
+                    pr: 1,
+                    position: "relative"
+                }}
+            >
+                <Timeline events={events} />
+                <Box
+                    sx={{
+                        position: "sticky",
+                        bottom: 0,
+                        height: "24px",
+                        background: "linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,1))",
+                        pointerEvents: "none"
+                    }}
+                />
+            </Box>
+
+        </Box>
     );
 }

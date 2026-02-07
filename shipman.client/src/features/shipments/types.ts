@@ -1,7 +1,10 @@
 export interface ShipmentEvent {
     timestamp: string;
+    eventType: string;
+    location: string;
     description: string;
 }
+
 
 export interface ShipmentDetails {
     id: string;
@@ -54,7 +57,7 @@ export interface Shipment {
     status: string
     createdAt: string
 }
-export interface ShipmentStatusDto {
+export interface MetadataOptionDto {
     value: string
     label: string
 }
