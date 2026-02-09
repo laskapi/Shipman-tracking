@@ -1,7 +1,7 @@
 import { Box } from "@mui/material";
-import Timeline from "@/components/Timeline";
-import PanelHeader from "@/components/PanelHeader";
-import type { ShipmentEvent } from "../features/shipments/types";
+import Timeline from "./Timeline";
+import PanelHeader from "@/ui/PanelHeader";
+import type { ShipmentEvent } from "@/features/shipments/types";
 
 export default function TimelinePanel({ events }: { events: ShipmentEvent[] }) {
     return (

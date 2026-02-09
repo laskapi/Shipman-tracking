@@ -1,6 +1,6 @@
 import { useAddShipmentEventMutation, useGetShipmentEventTypesQuery } from "@/features/shipments/shipmentsApi";
 import { Box, Button } from "@mui/material";
-import PanelHeader from "./PanelHeader";
+import PanelHeader  from "@/ui/PanelHeader";
 
 export default function EventActionsPanel({ shipmentId }: { shipmentId: string }) {
     const { data: eventTypes, isLoading: loadingTypes } = useGetShipmentEventTypesQuery();

@@ -1,6 +1,6 @@
 import type { GridColDef, GridRenderCellParams } from "@mui/x-data-grid"
 import type { ShipmentListItem } from "./types"
-import StatusBadge from "@/components/StatusBadge"
+import StatusBadge from "@/ui/StatusBadge"
 
 export const shipmentsColumns: GridColDef<ShipmentListItem>[] = [
     {

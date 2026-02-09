@@ -10,7 +10,9 @@ export interface ShipmentDetails {
     id: string;
     trackingNumber: string;
     sender: string;
-    receiver: string;
+    receiverName: string;
+    receiverEmail: string;
+    receiverPhone: string;
     origin: string;
     destination: string;
     weight: number;
