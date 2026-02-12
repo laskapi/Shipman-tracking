@@ -1,4 +1,4 @@
-interface PageHeaderProps {
+﻿interface PageHeaderProps {
     title: string
     subtitle?: string
     breadcrumb?: Array<{ label: string; to?: string }>
@@ -7,19 +7,22 @@ interface PageHeaderProps {
 
 import { Box, Stack, Typography, Breadcrumbs } from "@mui/material"
 import { Link as RouterLink } from "react-router-dom"
-
 export function PageHeader({ title, subtitle, breadcrumb, actions }: PageHeaderProps) {
-        
     return (
-        <Box mb={3}>
-            <Box sx={{ minHeight: 24, display: "flex", alignItems: "center" }}>
-            
+        <Box
+            sx={{
+                backgroundColor: "rgba(0,0,0,0.02)",
+                px: 2,
+                py: 2,
+                boxShadow: "0 1px 2px rgba(0,0,0,0.08)",
+            }}
+        >
             {breadcrumb && (
                 <Breadcrumbs sx={{ mb: 1 }}>
                     {breadcrumb.map((item, i) =>
                         item.to ? (
                             <RouterLink key={i} to={item.to} style={{ textDecoration: "none" }}>
-                                <Typography color="primary">{item.label}</Typography>
+                                <Typography color="text.secondary">{item.label}</Typography>
                             </RouterLink>
                         ) : (
                             <Typography key={i} color="text.primary">
@@ -28,30 +31,50 @@ export function PageHeader({ title, subtitle, breadcrumb, actions }: PageHeaderP
                         )
                     )}
                 </Breadcrumbs>
-                )}
-            </Box>
+            )}
 
-            <Stack direction="row" justifyContent="space-between" alignItems="center">
-
-                <Box>
-                    <Typography variant="h4" sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Stack
+                direction={{ xs: "column", md: "row" }}
+                justifyContent="space-between"
+                alignItems={{ xs: "flex-start", md: "center" }}
+                spacing={2}
+            >
+                {/* LEFT SIDE: title + subtitle */}
+                <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
+                    <Typography variant="h4" color="text.primary">
                         {title}
-                        {subtitle && (
+                    </Typography>
+
+                    {subtitle && (
+                        <Stack direction="row" spacing={1} alignItems="center">
+                            <Typography component="span" color="text.secondary">
+                                ●
+                            </Typography>
                             <Typography
                                 component="span"
                                 variant="h6"
                                 color="text.secondary"
                                 sx={{ fontWeight: 400 }}
                             >
-                                {"\u25CF"} {subtitle}
+                                {subtitle}
                             </Typography>
-                        )}
-                    </Typography>
+                        </Stack>
+                    )}
+                </Stack>
 
-                </Box>
-
+                {/* RIGHT SIDE: actions */}
                 {actions && (
-                    <Stack direction="row" spacing={1}>
+                    <Stack
+                        direction="row"
+                        spacing={1}
+                        alignItems="center"
+                        sx={{
+                            flexWrap: "wrap",
+                            rowGap: 1,
+                            width: { xs: "100%", md: "auto" },
+                            justifyContent: { xs: "flex-start", md: "flex-end" },
+                        }}
+                    >
                         {actions}
                     </Stack>
                 )}
@@ -59,3 +82,4 @@ export function PageHeader({ title, subtitle, breadcrumb, actions }: PageHeaderP
         </Box>
     )
 }
+

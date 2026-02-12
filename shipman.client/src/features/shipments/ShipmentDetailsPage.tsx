@@ -39,21 +39,22 @@ export default function ShipmentDetailsPage() {
         <Box>
             <Box
                 sx={{
+                    px: { xs: 2, md: 0 },
                     display: "grid",
                     gridTemplateColumns: {
                         xs: "1fr",
                         md: "minmax(500px, 1fr) 360px"
                     },
-                    gap: 4
+                    gap: 2
                 }}
             >
-                <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                     <ShipmentSummary shipment={shipment} />
                     <ShipmentMetadata shipment={shipment} />
                 </Box>
 
                 <Box>
-                    <Paper sx={{ p: 3, borderRadius: 3 }}>
+                    <Paper>
                         <TimelinePanel events={shipment.events} />
                         <Divider sx={{ my: 3 }} />
                         <Box sx={{ mt: 2 }}>

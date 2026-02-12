@@ -1,9 +1,9 @@
+import theme from "@/theme/theme"
+import { ThemeProvider } from "@mui/material/styles"
 import type { ReactNode } from "react"
 import { Provider } from "react-redux"
 import { BrowserRouter } from "react-router-dom"
-import { ThemeProvider } from "@mui/material/styles"
 import { store } from "./store"
-import theme from "@/theme/theme"
 
 interface ProvidersProps {
     children: ReactNode

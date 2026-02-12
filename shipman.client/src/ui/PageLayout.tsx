@@ -1,9 +1,9 @@
+import { Button, Box } from "@mui/material"
 import { useSelector } from "react-redux"
-import { Outlet, useNavigate, useParams } from "react-router-dom"
-import { Box, Button } from "@mui/material"
-import { PageHeader } from "./PageHeader"
+import { useNavigate, useParams, Outlet } from "react-router"
 import { HeaderActionsType } from "../app/headerSlice"
-import type { RootState } from "@/app/store"
+import { PageHeader } from "./PageHeader"
+import type { RootState } from "../app/store"
 
 export function PageLayout() {
     const header = useSelector((state: RootState) => state.header)
@@ -54,11 +54,17 @@ export function PageLayout() {
                 </>
             )
             break
-
     }
 
     return (
-        <Box sx={{ p: 3 }}>
+        <Box
+            sx={{
+                display: "flex",
+                flexDirection: "column",
+                height: "100vh",
+
+            }}
+        >
             <PageHeader
                 title={header.title}
                 subtitle={header.subtitle}
@@ -66,7 +72,12 @@ export function PageLayout() {
                 actions={actions}
             />
 
-            <Box sx={{ mt: 3 }}>
+            <Box sx={{
+                flexGrow: 1,
+                overflow: "auto",
+                px: { xs: 0, md: 3 },
+                py: { xs: 0, md: 3 },
+            }}>
                 <Outlet />
             </Box>
         </Box>

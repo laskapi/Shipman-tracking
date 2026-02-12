@@ -4,14 +4,7 @@ import PanelHeader from "@/ui/PanelHeader";
 
 export default function ShipmentMetadata({ shipment }: { shipment: ShipmentDetails }) {
     return (
-        <Paper
-            elevation={1}
-            sx={{
-                p: 3,
-                borderRadius: 3,
-                mb: 3,
-            }}
-        >
+        <Paper>
             <PanelHeader>Metadata</PanelHeader>
 
             <Grid container spacing={2}>

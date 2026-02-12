@@ -1,5 +1,6 @@
 import { Box, Paper, Typography, Grid } from "@mui/material"
 import type { ShipmentDetails } from "@/features/shipments/types"
+import PanelHeader from "../../../ui/PanelHeader";
 
 interface Props {
     shipment: ShipmentDetails
@@ -7,17 +8,8 @@ interface Props {
 
 export default function ShipmentSummary({ shipment }: Props) {
     return (
-        <Paper
-            elevation={1}
-            sx={{
-                p: 3,
-                borderRadius: 3,
-                mb: 3
-            }}
-        >
-            <Typography variant="h6" sx={{ mb: 2 }}>
-                Shipment Summary
-            </Typography>
+        <Paper>
+            <PanelHeader>Shipment Summary</PanelHeader>
 
             <Grid container spacing={2}>
                 <Grid size={{ xs: 12, sm: 6 }}>
