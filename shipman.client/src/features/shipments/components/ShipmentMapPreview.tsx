@@ -5,8 +5,9 @@ import "leaflet/dist/leaflet.css"
 type LatLng = [number, number]
 
 interface ShipmentMapPreviewProps {
-    origin: { lat: number; lng: number }
-    destination: { lat: number; lng: number }
+    originCoordinates: { lat: number; lng: number }
+    destinationCoordinates: { lat: number; lng: number }
+
 }
 
 const defaultIcon: L.Icon = new L.Icon({

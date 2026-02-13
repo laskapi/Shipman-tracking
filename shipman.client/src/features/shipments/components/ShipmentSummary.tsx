@@ -21,13 +21,16 @@ export default function ShipmentSummary({ shipment }: Props) {
                 </Grid>
 
                 <Grid size={{ xs: 12, sm: 6 }}>
-                    <SummaryItem label="Sender" value={shipment.sender} />
+                    <SummaryItem
+                        label="Sender"
+                        value={`${shipment.sender.name} (${shipment.sender.email}, ${shipment.sender.phone})`}
+                    />
                 </Grid>
 
                 <Grid size={{ xs: 12, sm: 6 }}>
                     <SummaryItem
                         label="Receiver"
-                        value={`${shipment.receiverName} (${shipment.receiverEmail}, ${shipment.receiverPhone})`}
+                        value={`${shipment.receiver.name} (${shipment.receiver.email}, ${shipment.receiver.phone})`}
                     />
                 </Grid>
 
