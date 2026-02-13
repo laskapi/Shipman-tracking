@@ -1,11 +1,11 @@
 import type { GridColDef, GridRenderCellParams } from "@mui/x-data-grid"
 import type { ShipmentListItem } from "./types"
-import StatusBadge from "@/components/StatusBadge"
+import StatusBadge from "@/ui/StatusBadge"
 
 export const shipmentsColumns: GridColDef<ShipmentListItem>[] = [
     {
         field: "trackingNumber",
-        headerName: "Tracking Number",
+        headerName: "Tracking number",
         flex: 1,
         minWidth: 150,
     },
@@ -32,7 +32,7 @@ export const shipmentsColumns: GridColDef<ShipmentListItem>[] = [
     },
     {
         field: "updatedAt",
-        headerName: "Last Updated",
+        headerName: "Last updated",
         flex: 1,
         minWidth: 160,
 

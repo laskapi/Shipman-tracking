@@ -1,5 +1,5 @@
 import { Box, Typography } from "@mui/material";
-import type { ShipmentEvent } from "../features/shipments/types";
+import type { ShipmentEvent } from "@/features/shipments/types";
 
 interface TimelineProps {
     events: ShipmentEvent[];

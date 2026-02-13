@@ -10,7 +10,7 @@ export interface UpdateShipmentStatusRequest {
     status: string
 }
 
-export const shipmentApi = api.injectEndpoints({
+export const shipmentsApi = api.injectEndpoints({
     endpoints: builder => ({
         getShipments: builder.query<PagedResult<ShipmentListItem>, ShipmentsQueryParams>({
             query: (params) => ({ url: "shipments", params })
@@ -59,4 +59,4 @@ export const {
     useAddShipmentEventMutation,
     useGetShipmentStatusesQuery,
     useGetShipmentEventTypesQuery
-} = shipmentApi
+} = shipmentsApi

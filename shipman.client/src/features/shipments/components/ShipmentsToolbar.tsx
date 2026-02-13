@@ -1,81 +1,82 @@
-import { Button, TextField, MenuItem, Paper, FormControl, InputLabel, Select } from "@mui/material"
+import {
+    Box,
+    TextField,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem,
+    Stack,
+    Button
+} from "@mui/material"
 import ClearIcon from "@mui/icons-material/Clear"
 import RefreshIcon from "@mui/icons-material/Refresh"
-import type { MetadataOptionDto } from "../types"
-interface Props {
-    statuses: MetadataOptionDto[]
-    statusFilter: string
-    setStatusFilter: (value: string) => void
-    search: string
-    setSearch: (value: string) => void
-    onClear: () => void
-    onRefresh: () => void
-}
-
-export function ShipmentsToolbar({
-    statuses,
-    statusFilter,
-    setStatusFilter,
-    search,
-    setSearch,
-    onClear,
-    onRefresh
-}: Props) {
+import type { ShipmentsToolbarController } from "../types"
+import type { SelectChangeEvent } from "@mui/material"
+export function ShipmentsToolbar({ ctrl }: { ctrl: ShipmentsToolbarController }) {
     return (
-        <Paper
-            elevation={1}
+        <Box
             sx={{
-                p: 2,
-                mb: 2,
+                px: { xs: 2, md: 3 },
+                py: { xs: 1, md: 1 },
                 display: "flex",
-                gap: 2,
-                alignItems: "center",
-                borderRadius: 2
+                flexDirection: { xs: "column", md: "row" },
+                gap: { xs: 1.5, md: 2 },
+                alignItems: { xs: "stretch", md: "center" },
+                backgroundColor: "background.paper",
             }}
         >
-            <FormControl size="small" sx={{ width: 200 }}>
-                <InputLabel shrink>Status</InputLabel>
+            <TextField
+                label="Search tracking number"
+                value={ctrl.search}
+                onChange={(e) => ctrl.setSearch(e.target.value)}
+                size="small"
+                fullWidth
+            />
 
+            <FormControl size="small" sx={{ width: { xs: "100%", md: 200 } }}>
+                <InputLabel shrink>Status</InputLabel>
                 <Select
                     label="Status"
-                    value={statusFilter}
-                    onChange={(e) => setStatusFilter(e.target.value)}
+                    value={ctrl.status}
+                    onChange={(e: SelectChangeEvent<string>) => ctrl.setStatus(e.target.value)}
                     displayEmpty
-                    renderValue={(value: string) =>
-                        value === "" ? "All statuses" : statuses.find(s=>s.value===value)?.label
+                    renderValue={(value) =>
+                        value === ""
+                            ? "All statuses"
+                            : ctrl.statuses.find((s) => s.value === value)?.label
                     }
                 >
                     <MenuItem value="">All statuses</MenuItem>
-
-                    {statuses.map((s) => (
+                    {ctrl.statuses.map((s) => (
                         <MenuItem key={s.value} value={s.value}>
                             {s.label}
                         </MenuItem>
                     ))}
                 </Select>
             </FormControl>
-            <TextField
-                label="Search tracking number"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                size="small"
-                fullWidth
-            />
-            <Button
-                variant="outlined"
-                color="warning"
-                onClick={onClear}
-                startIcon={<ClearIcon />}
+
+            <Stack
+                direction={{ xs: "column", md: "row" }}
+                spacing={1.5}
             >
-                Clear
-            </Button>
-            <Button
-                variant="contained"
-                onClick={onRefresh}
-                startIcon={<RefreshIcon />}
-            >
-                Refresh
-            </Button>
-        </Paper>
+                <Button
+                    variant="outlined"
+                    color="warning"
+                    onClick={ctrl.clear}
+                    startIcon={<ClearIcon />}
+                >
+                    Clear
+                </Button>
+
+                <Button
+                    variant="contained"
+                    onClick={ctrl.refresh}
+                    startIcon={<RefreshIcon />}
+                >
+                    Refresh
+                </Button>
+            </Stack>
+        </Box>
     )
 }
+
