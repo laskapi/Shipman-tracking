@@ -5,7 +5,9 @@ public class CreateShipmentDtoValidator : AbstractValidator<CreateShipmentDto>
 {
     public CreateShipmentDtoValidator()
     {
-        RuleFor(x => x.Sender).NotEmpty();
+        RuleFor(x => x.SenderName).NotEmpty();
+        RuleFor(x => x.SenderEmail).NotEmpty();
+        RuleFor(x => x.SenderPhone).NotEmpty();
         RuleFor(x => x.ReceiverName).NotEmpty();
         RuleFor(x => x.ReceiverEmail).NotEmpty().EmailAddress();
         RuleFor(x => x.ReceiverPhone).NotEmpty();

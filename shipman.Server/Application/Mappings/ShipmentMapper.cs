@@ -11,19 +11,35 @@ public static class ShipmentMapper
         {
             Id = shipment.Id,
             TrackingNumber = shipment.TrackingNumber,
-            Sender = shipment.Sender,
-            ReceiverName = shipment.Receiver.Name,
-            ReceiverEmail = shipment.Receiver.Email,
-            ReceiverPhone = shipment.Receiver.Phone,
+            Sender = new ContactDto {
+                Name = shipment.Sender.Name,
+                Email = shipment.Sender.Email,
+                Phone = shipment.Sender.Phone 
+            },
+            Receiver = new ContactDto {
+                Name = shipment.Receiver.Name,
+                Email = shipment.Receiver.Email,
+                Phone = shipment.Receiver.Phone 
+            },
             Origin = shipment.Origin,
+            OriginCoordinates = new CoordinatesDto
+            { 
+                Lat = shipment.OriginCoordinates.Lat,
+                Lng = shipment.OriginCoordinates.Lng 
+            },
             Destination = shipment.Destination,
+            DestinationCoordinates = new CoordinatesDto 
+            { 
+                Lat = shipment.DestinationCoordinates.Lat, 
+                Lng = shipment.DestinationCoordinates.Lng 
+            },
             Weight = shipment.Weight,
             ServiceType = shipment.ServiceType,
             Status = shipment.Status,
             CreatedAt = shipment.CreatedAt,
             UpdatedAt = shipment.UpdatedAt,
             EstimatedDelivery = shipment.EstimatedDelivery,
-            
+
             Events = shipment.Events
                 .OrderByDescending(e => e.Timestamp)
                 .Select(e => new ShipmentEventDto
@@ -42,7 +58,7 @@ public static class ShipmentMapper
         {
             Id = shipment.Id,
             TrackingNumber = shipment.TrackingNumber,
-            Sender = shipment.Sender,
+            Sender = shipment.Receiver.Name,
             ReceiverName = shipment.Receiver.Name,
             Origin = shipment.Origin,
             Destination = shipment.Destination,

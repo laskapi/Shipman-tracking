@@ -21,7 +21,7 @@ public static class ServiceDataFactory
             Id = id ?? Guid.NewGuid(),
             TrackingNumber = "TN123",
             Sender = "Sender",
-            Receiver = new Receiver("Receiver Name", "receiver@example.com", "+48 600 000 000"),
+            Receiver = new Contact("Receiver Name", "receiver@example.com", "+48 600 000 000"),
             Origin = "A",
             Destination = "B",
             Weight = 1,

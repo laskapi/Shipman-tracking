@@ -8,6 +8,8 @@ import ShipmentMetadata from "./components/ShipmentMetadata"
 import ShipmentSummary from "./components/ShipmentSummary"
 import TimelinePanel from "./components/TimelinePanel"
 import { useGetShipmentByIdQuery } from "./shipmentsApi"
+import { ShipmentMapPreview } from "./components/ShipmentMapPreview"
+
 
 export default function ShipmentDetailsPage() {
     const { id } = useParams()

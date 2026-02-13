@@ -14,7 +14,7 @@ namespace shipman.Tests.Unit.Domain
                 Origin = "A",
                 Destination = "B",
                 Sender = "Sender",
-                Receiver = new Receiver("Receiver Name", "receiver@example.com", "+48 600 000 000"),
+                Receiver = new Contact("Receiver Name", "receiver@example.com", "+48 600 000 000"),
                 Weight = 1,
                 ServiceType = ServiceType.Standard
             };

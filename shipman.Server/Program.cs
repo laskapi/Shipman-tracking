@@ -29,6 +29,7 @@ builder.Services.AddScoped<IMailSender>(sp =>
 });
 builder.Services.AddScoped<INotificationService, NotificationService>();
 
+builder.Services.AddHttpClient<GeocodingService>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
 {
