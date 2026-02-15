@@ -23,9 +23,9 @@
         "ASPNETCORE_HOSTINGSTARTUPASSEMBLIES": "Microsoft.AspNetCore.SpaProxy"
       
       },
-      "SpaProxyServerUrl": "https://localhost:62992",
-      "SpaProxyLaunchCommand": "npm run dev",
-      "SpaRoot": "..\\shipman.client"
+//      "SpaProxyServerUrl": "https://localhost:62992",
+ //     "SpaProxyLaunchCommand": "npm run dev",
+  //    "SpaRoot": "..\\shipman.client"
     }
   }
 }
