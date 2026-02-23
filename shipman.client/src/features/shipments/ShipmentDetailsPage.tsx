@@ -35,6 +35,7 @@ export default function ShipmentDetailsPage()
             )
         }
     }, [shipment, dispatch])
+
     if (!shipment)
     {
         return <div>Loading shipment...</div>
@@ -43,68 +44,94 @@ export default function ShipmentDetailsPage()
     return (
         <Box
             sx={{
-                display: "flex",
-                height: "100%",
+                display: "grid",
+                gridTemplateColumns: {
+                    xs: "1fr",
+                    md: "3fr 1fr",
+                },
                 gap: 2,
                 p: 2,
+                alignItems: "stretch",
+                overflowY: { xs: "auto", md: "hidden" }
+
             }}
         >
             {/* LEFT COLUMN */}
-            <Box
+
+            <Paper
                 sx={{
+                    minWidth: 0,
+                    minHeight: 0,
                     display: "flex",
-                    flex: 3,
+                    flexDirection: {
+                        xs: "column",
+                        md: "row"
+                    },
+                    gap: 2,
+                    p: 2,
+                }}
+            >
+                {/* SUMMARY */}
+                <Box
+                    sx={{
+                        flex: 1,
+                    }}
+                >
+                    <ShipmentSummary shipment={shipment} />
+                </Box>
+
+                {/* TIMELINE */}
+                <Box
+                    sx={{
+                        flex: "1 1 0",
+                        display: "flex",
+                        flexDirection: "column",
+                        maxHeight: "100%",
+                        p: 2
+                    }}
+                >
+                    <Box sx={{
+                        flex: "1 1 0",
+                        overflowY: {
+                            xs: "none",
+                            md: "auto",
+                        }
+                    }
+                    } >
+                        <TimelinePanel events={shipment.events} />
+                    </Box>
+
+                    <Divider sx={{ my: 2 }} />
+                    <EventActionsPanel shipmentId={shipment.id} />
+                </Box>
+            </Paper>
+
+            {/* RIGHT COLUMN */}
+            <Paper
+                sx={{
+                    p: 2,
+                    display: "flex",
                     flexDirection: "column",
                     gap: 2,
                 }}
             >
-                {/* Summary */}
-                <ShipmentSummary shipment={shipment} />
-
-                {/* Route + Map */}
-                <Paper
+                <Box
                     sx={{
-                        p: 2,
-                        display: "flex",
-                        minHeight: 0,
-                        flex:1
+                        width: "100%",
+                        maxWidth: "100%",
+                        aspectRatio: "1 / 1",
                     }}
                 >
-                    {/* Route info */}
-                    <ShipmentRouteDetails shipment={shipment} />
-
-                    {/* Small map */}
-                    <Box sx={{ flex: 1, minHeight: 0, height: "100%" }}>
-                            <ShipmentMapPreview
-                                origin={shipment.originCoordinates}
-                                destination={shipment.destinationCoordinates}
-                            />
-                    </Box>
-                </Paper>
-            </Box>
-
-            {/* RIGHT COLUMN */}
-
-            <Paper
-                sx={{
-                    p: 2,
-                    flex: "1 1 0",
-                    display: "flex",
-                    flexDirection: "column",
-                    minHeight: 0,
-                    overflow: "hidden",
-
-                }}
-            >
-                <Box sx={{
-                    flexGrow: 1, minHeight: 0, overflowY: "auto"
-                }}>
-                    <TimelinePanel events={shipment.events} />
+                    <ShipmentMapPreview
+                        origin={shipment.originCoordinates}
+                        destination={shipment.destinationCoordinates}
+                    />
                 </Box>
-                <Divider sx={{ my: 2 }} />
-                <EventActionsPanel shipmentId={shipment.id} />
-            </Paper>
 
+                <ShipmentRouteDetails shipment={shipment} />
+            </Paper>
         </Box>
+
+
     )
 }

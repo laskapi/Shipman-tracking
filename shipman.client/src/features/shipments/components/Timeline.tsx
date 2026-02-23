@@ -17,7 +17,7 @@ export default function Timeline({ events }: TimelineProps) {
     );
 
     return (
-        <Box sx={{ position: "relative", pl: 3 }}>
+        <Box sx={{ position: "relative", px: 1 }}>
             {sorted.map((event, index) => (
                 <Box key={event.timestamp + index} sx={{ mb: 4, position: "relative" }}>
                     <Box
@@ -30,14 +30,13 @@ export default function Timeline({ events }: TimelineProps) {
                             borderRadius: "50%",
                             bgcolor: "primary.main",
                             border: "2px solid white",
-                            zIndex: 1,
                         }}
                     />
                     <Box sx={{ ml: 3 }}>
-                        <Typography fontWeight={600}>
+                        <Typography fontWeight={600} noWrap>
                             {new Date(event.timestamp).toLocaleString()}
                         </Typography>
-                        <Typography color="text.secondary">
+                        <Typography color="text.secondary" noWrap>
                             {event.description}
                         </Typography>
                     </Box>

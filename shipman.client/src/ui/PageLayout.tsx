@@ -61,8 +61,6 @@ export function PageLayout() {
             sx={{
                 display: "grid",
                 gridTemplateRows: "auto 1fr",
-                overflow: "hidden"
-,                height: "100vh",
 
             }}
         >
@@ -73,10 +71,12 @@ export function PageLayout() {
                 actions={actions}
             />
 
-            <Box sx={{             
+
+            <Box sx={{
                 px: { xs: 0, md: 3 },
                 py: { xs: 0, md: 3 },
-                overflow: "hidden",
+                overflowY: { xs: "auto", md: "hidden" },
+                overflowX: "hidden",
             }}>
                 <Outlet />
             </Box>
