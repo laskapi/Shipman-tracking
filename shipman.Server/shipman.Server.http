@@ -1,6 +1,1 @@
 @shipman.Server_HostAddress = http://localhost:5083
-
-GET {{shipman.Server_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

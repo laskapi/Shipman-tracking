@@ -5,24 +5,41 @@ export interface ShipmentEvent {
     description: string;
 }
 
-
 export interface ShipmentDetails {
     id: string;
     trackingNumber: string;
-    sender: string;
-    receiverName: string;
-    receiverEmail: string;
-    receiverPhone: string;
-    origin: string;
-    destination: string;
+
+    sender: ContactDto;
+    receiver: ContactDto;
+
+    originCoordinates: CoordinatesDto;
+    destinationCoordinates: CoordinatesDto;
+
     weight: number;
     serviceType: string;
     status: string;
+
+    origin: string;
+    destination: string;
+
     createdAt: string;
     updatedAt: string;
     estimatedDelivery: string | null;
+
     events: ShipmentEvent[];
 }
+
+export interface ContactDto {
+    name: string;
+    email: string;
+    phone: string;
+}
+
+export interface CoordinatesDto {
+    lat: number;
+    lng: number;
+}
+
 export interface ShipmentListItem {
     id: string
     trackingNumber: string

@@ -1,4 +1,5 @@
-﻿using shipman.Server.Domain.Enums;
+﻿using shipman.Server.Domain.Entities.ValueObjects;
+using shipman.Server.Domain.Enums;
 using shipman.Server.Domain.Extensions;
 
 namespace shipman.Server.Domain.Entities;
@@ -7,10 +8,15 @@ public class Shipment
 {
     public Guid Id { get; set; }
     public string TrackingNumber { get; set; } = default!;
-    public string Sender { get; set; } = default!;
-    public Receiver Receiver { get; set; } = default!;
+    public Contact Sender { get; set; } = default!;
+    public Contact Receiver { get; set; } = default!;
+    
     public string Origin { get; set; } = default!;
+    public Coordinates OriginCoordinates { get; set; } = default!;
+
     public string Destination { get; set; } = default!;
+    public Coordinates DestinationCoordinates { get; set; } = default!;
+
     public decimal Weight { get; set; }
     public ServiceType ServiceType { get; set; } = ServiceType.Standard;
     public ShipmentStatus Status { get; set; } = ShipmentStatus.Processing;

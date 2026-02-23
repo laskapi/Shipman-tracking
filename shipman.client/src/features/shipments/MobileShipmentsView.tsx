@@ -1,8 +1,8 @@
-﻿import { Box, Paper, Typography, Stack, Button } from "@mui/material"
+﻿import { Box, Paper, Typography } from "@mui/material"
 import { ShipmentsToolbar } from "./components/ShipmentsToolbar"
 import type { ShipmentsController } from "./types"
 
-export function MobileShipmentsCards({ ctrl }: { ctrl: ShipmentsController }) {
+export function MobileShipmentsView({ ctrl }: { ctrl: ShipmentsController }) {
     const { data, handleRowClick } = ctrl
 
     return (

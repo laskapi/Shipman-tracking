@@ -29,6 +29,7 @@ builder.Services.AddScoped<IMailSender>(sp =>
 });
 builder.Services.AddScoped<INotificationService, NotificationService>();
 
+builder.Services.AddHttpClient<GeocodingService>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
 {
@@ -45,10 +46,10 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-    policy.WithOrigins("http://localhost:5173", "http://localhost:3000")
-    .AllowAnyHeader()
-    .AllowAnyMethod()
-    .AllowCredentials();
+        policy.WithOrigins("http://localhost:5173", "http://localhost:3000")
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowCredentials();
     });
 });
 

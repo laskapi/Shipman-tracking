@@ -2,9 +2,10 @@ import { Paper, Typography, Grid } from "@mui/material";
 import type { ShipmentDetails } from "@/features/shipments/types";
 import PanelHeader from "@/ui/PanelHeader";
 
-export default function ShipmentMetadata({ shipment }: { shipment: ShipmentDetails }) {
+export default function ShipmentMetadata({ shipment }: { shipment: ShipmentDetails })
+{
     return (
-        <Paper>
+        <>
             <PanelHeader>Metadata</PanelHeader>
 
             <Grid container spacing={2}>
@@ -28,6 +29,6 @@ export default function ShipmentMetadata({ shipment }: { shipment: ShipmentDetai
                     </Grid>
                 )}
             </Grid>
-        </Paper>
+        </>
     );
 }

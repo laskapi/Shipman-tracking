@@ -2,8 +2,10 @@
 using shipman.Server.Application.Dtos;
 using shipman.Server.Application.Dtos.Shipments;
 using shipman.Server.Application.Interfaces;
+using shipman.Server.Application.Services;
 using shipman.Server.Data;
 using shipman.Server.Domain.Entities;
+using shipman.Server.Domain.Entities.ValueObjects;
 using shipman.Server.Domain.Enums;
 using shipman.Server.Domain.Extensions;
 using shipman.Server.Infrastructure.Extensions;
@@ -14,35 +16,48 @@ public class ShipmentService : IShipmentService
     private readonly ILogger<ShipmentService> _logger;
     private readonly IAppDbContext _db;
     private readonly INotificationService _notifications;
-
+    private readonly GeocodingService _geocoding;
     public ShipmentService(
         ILogger<ShipmentService> logger,
         IAppDbContext db,
-        INotificationService notifications)
+        INotificationService notifications,
+        GeocodingService geocoding)
     {
         _logger = logger;
         _db = db;
         _notifications = notifications;
+        _geocoding = geocoding;
     }
 
-    public async Task<Shipment> CreateShipmentAsync(CreateShipmentDto request)
+    public async Task<Shipment> CreateShipmentAsync(CreateShipmentDto dto)
     {
-        _logger.LogInformation("Creating new shipment for receiver {Receiver}", request.ReceiverName);
+        _logger.LogInformation("Creating new shipment for receiver {Receiver}", dto.ReceiverName);
+
+        var (originLat, originLng) = await _geocoding.GeocodeAsync(dto.Origin);
+        var (destLat, destLng) = await _geocoding.GeocodeAsync(dto.Destination);
 
         var shipment = new Shipment
         {
             Id = Guid.NewGuid(),
             TrackingNumber = Guid.NewGuid().ToString("N")[..12].ToUpper(),
-            Sender = request.Sender,
-            Receiver = new Receiver(
-                request.ReceiverName,
-                request.ReceiverEmail,
-                request.ReceiverPhone
+            Sender = new Contact(
+                dto.SenderName,
+                dto.SenderEmail,
+            dto.SenderPhone
             ),
-            Origin = request.Origin,
-            Destination = request.Destination,
-            Weight = request.Weight,
-            ServiceType = request.ServiceType
+            Receiver = new Contact(
+                dto.ReceiverName,
+                dto.ReceiverEmail,
+            dto.ReceiverPhone
+            ),
+            Origin = dto.Origin,
+            OriginCoordinates = new Coordinates(originLat, originLng),
+
+            Destination = dto.Destination,
+            DestinationCoordinates = new Coordinates(destLat, destLng),
+
+            Weight = dto.Weight,
+            ServiceType = dto.ServiceType
         };
 
         shipment.CalculateEstimatedDelivery();
@@ -54,7 +69,7 @@ public class ShipmentService : IShipmentService
                 Id = Guid.NewGuid(),
                 Timestamp = DateTime.UtcNow,
                 EventType = ShipmentEventType.Created,
-                Location = request.Origin,
+                Location = dto.Origin,
                 Description = "Shipment created"
             });
         }

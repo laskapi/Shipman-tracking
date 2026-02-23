@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux"
 import { setHeader, HeaderActionsType } from "../../app/headerSlice"
 import { useShipmentsController } from "./useShipmentsController"
 import { DesktopShipmentsView } from "./DesktopShipmentsView"
-import { MobileShipmentsCards } from "./MobileShipmentsCards"
+import { MobileShipmentsView } from "./MobileShipmentsView"
 
 export default function ShipmentsPage() {
     const dispatch = useDispatch()
@@ -27,7 +27,7 @@ export default function ShipmentsPage() {
     return (
         <>
             <DesktopShipmentsView ctrl={ctrl} />
-            <MobileShipmentsCards ctrl={ctrl} />
+            <MobileShipmentsView ctrl={ctrl} />
         </>
     )
 }

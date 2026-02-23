@@ -10,7 +10,6 @@ public class AppDbContext : DbContext, IAppDbContext
     public virtual DbSet<AppUser> Users { get; set; } = default!;
     public virtual DbSet<Shipment> Shipments { get; set; } = default!;
     public virtual DbSet<ShipmentEvent> ShipmentEvents { get; set; } = default!;
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -21,25 +20,11 @@ public class AppDbContext : DbContext, IAppDbContext
                   .WithOne(e => e.Shipment)
                   .HasForeignKey(e => e.ShipmentId);
 
-            entity.OwnsOne(s => s.Receiver, r =>
-            {
-                r.Property(x => x.Name)
-                    .HasColumnName("ReceiverName")
-                    .IsRequired();
+            entity.OwnsOne(s => s.Sender);
+            entity.OwnsOne(s => s.Receiver);
 
-                r.Property(x => x.Email)
-                    .HasColumnName("ReceiverEmail")
-                    .IsRequired();
-
-                r.Property(x => x.Phone)
-                    .HasColumnName("ReceiverPhone")
-                    .IsRequired();
-            });
+            entity.OwnsOne(s => s.OriginCoordinates);
+            entity.OwnsOne(s => s.DestinationCoordinates);
         });
-
     }
-
 }
-
-
-
