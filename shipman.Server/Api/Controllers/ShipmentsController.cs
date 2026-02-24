@@ -25,7 +25,7 @@ public class ShipmentsController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<ShipmentDetailsDto>> CreateShipment([FromBody] CreateShipmentDto dto)
     {
-        _logger.LogInformation("Received request to create shipment for {Receiver}", dto.ReceiverName);
+        _logger.LogInformation("Received request to create shipment for {Receiver}", dto.Receiver.Name);
 
         var shipment = await _service.CreateShipmentAsync(dto);
 

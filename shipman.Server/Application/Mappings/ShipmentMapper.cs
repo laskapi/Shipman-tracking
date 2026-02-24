@@ -11,28 +11,37 @@ public static class ShipmentMapper
         {
             Id = shipment.Id,
             TrackingNumber = shipment.TrackingNumber,
-            Sender = new ContactDto {
+
+            Sender = new ContactDto
+            {
                 Name = shipment.Sender.Name,
                 Email = shipment.Sender.Email,
-                Phone = shipment.Sender.Phone 
+                Phone = shipment.Sender.Phone,
+                Address = shipment.Sender.Address
             },
-            Receiver = new ContactDto {
+
+            Receiver = new ContactDto
+            {
                 Name = shipment.Receiver.Name,
                 Email = shipment.Receiver.Email,
-                Phone = shipment.Receiver.Phone 
+                Phone = shipment.Receiver.Phone,
+                Address = shipment.Receiver.Address
             },
-            Origin = shipment.Origin,
+
+            Origin = shipment.Sender.Address,
             OriginCoordinates = new CoordinatesDto
-            { 
+            {
                 Lat = shipment.OriginCoordinates.Lat,
-                Lng = shipment.OriginCoordinates.Lng 
+                Lng = shipment.OriginCoordinates.Lng
             },
-            Destination = shipment.Destination,
-            DestinationCoordinates = new CoordinatesDto 
-            { 
-                Lat = shipment.DestinationCoordinates.Lat, 
-                Lng = shipment.DestinationCoordinates.Lng 
+
+            Destination = shipment.Receiver.Address,
+            DestinationCoordinates = new CoordinatesDto
+            {
+                Lat = shipment.DestinationCoordinates.Lat,
+                Lng = shipment.DestinationCoordinates.Lng
             },
+
             Weight = shipment.Weight,
             ServiceType = shipment.ServiceType,
             Status = shipment.Status,
@@ -52,18 +61,23 @@ public static class ShipmentMapper
                 .ToList()
         };
     }
+
     public static ShipmentListItemDto ToListItemDto(this Shipment shipment)
     {
         return new ShipmentListItemDto
         {
             Id = shipment.Id,
             TrackingNumber = shipment.TrackingNumber,
-            Sender = shipment.Receiver.Name,
+
+            Sender = shipment.Sender.Name,
             ReceiverName = shipment.Receiver.Name,
-            Origin = shipment.Origin,
-            Destination = shipment.Destination,
+
+            Origin = shipment.Sender.Address,
+            Destination = shipment.Receiver.Address,
+
             Status = shipment.Status,
             UpdatedAt = shipment.UpdatedAt
         };
     }
+
 }

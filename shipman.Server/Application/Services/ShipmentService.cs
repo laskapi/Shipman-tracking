@@ -31,29 +31,34 @@ public class ShipmentService : IShipmentService
 
     public async Task<Shipment> CreateShipmentAsync(CreateShipmentDto dto)
     {
-        _logger.LogInformation("Creating new shipment for receiver {Receiver}", dto.ReceiverName);
+        _logger.LogInformation("Creating new shipment for receiver {Receiver}", dto.Receiver.Name);
 
-        var (originLat, originLng) = await _geocoding.GeocodeAsync(dto.Origin);
-        var (destLat, destLng) = await _geocoding.GeocodeAsync(dto.Destination);
+        var (originLat, originLng) = await _geocoding.GeocodeAsync(dto.Sender.Address);
+        var (destLat, destLng) = await _geocoding.GeocodeAsync(dto.Receiver.Address);
+
+        var sender = new Contact(
+            dto.Sender.Name,
+            dto.Sender.Email,
+            dto.Sender.Phone,
+            dto.Sender.Address
+        );
+
+        var receiver = new Contact(
+            dto.Receiver.Name,
+            dto.Receiver.Email,
+            dto.Receiver.Phone,
+            dto.Receiver.Address
+        );
 
         var shipment = new Shipment
         {
             Id = Guid.NewGuid(),
             TrackingNumber = Guid.NewGuid().ToString("N")[..12].ToUpper(),
-            Sender = new Contact(
-                dto.SenderName,
-                dto.SenderEmail,
-            dto.SenderPhone
-            ),
-            Receiver = new Contact(
-                dto.ReceiverName,
-                dto.ReceiverEmail,
-            dto.ReceiverPhone
-            ),
-            Origin = dto.Origin,
-            OriginCoordinates = new Coordinates(originLat, originLng),
 
-            Destination = dto.Destination,
+            Sender = sender,
+            Receiver = receiver,
+
+            OriginCoordinates = new Coordinates(originLat, originLng),
             DestinationCoordinates = new Coordinates(destLat, destLng),
 
             Weight = dto.Weight,
@@ -69,7 +74,7 @@ public class ShipmentService : IShipmentService
                 Id = Guid.NewGuid(),
                 Timestamp = DateTime.UtcNow,
                 EventType = ShipmentEventType.Created,
-                Location = dto.Origin,
+                Location = dto.Sender.Address,
                 Description = "Shipment created"
             });
         }
@@ -87,6 +92,7 @@ public class ShipmentService : IShipmentService
         await _notifications.ShipmentCreatedAsync(shipment);
         return shipment;
     }
+
 
     public async Task<PagedResultDto<Shipment>> GetAllAsync(
      int page,
@@ -173,7 +179,7 @@ public class ShipmentService : IShipmentService
             ShipmentId = shipment.Id,
             Timestamp = DateTime.UtcNow,
             EventType = dto.EventType,
-            Location = shipment.Origin,
+            Location = shipment.Sender.Address,
             Description = dto.EventType.ToDescription()
         };
 
@@ -227,8 +233,14 @@ public class ShipmentService : IShipmentService
             throw new InvalidOperationException("Cannot update a completed shipment.");
         }
 
-        if (dto.Destination != null)
-            shipment.Destination = dto.Destination;
+        if (!string.IsNullOrWhiteSpace(dto.Destination))
+        {
+            shipment.Receiver = shipment.Receiver with { Address = dto.Destination };
+
+            var (lat, lng) = await _geocoding.GeocodeAsync(dto.Destination);
+            shipment.DestinationCoordinates = new Coordinates(lat, lng);
+        }
+
 
         if (dto.Weight.HasValue)
             shipment.Weight = dto.Weight.Value;
