@@ -115,3 +115,25 @@ export interface ShipmentsController {
 
     toolbar: ShipmentsToolbarController
 }
+
+export interface ContactRequest
+{
+    name: string;
+    email: string;
+    phone: string;
+    address: string;
+}
+
+export interface CreateShipmentRequest
+{
+    sender: ContactRequest;
+    receiver: ContactRequest;
+    weight: number;
+    serviceType: "Standard" | "Express" | "Priority";
+}
+
+export interface UpdateShipmentStatusRequest
+{
+    id: string;
+    status: string;
+}

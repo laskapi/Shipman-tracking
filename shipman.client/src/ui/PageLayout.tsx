@@ -15,7 +15,7 @@ export function PageLayout() {
     switch (header.actionsType) {
         case HeaderActionsType.ShipmentsList:
             actions = (
-                <Button variant="contained" onClick={() => navigate("/shipments/new")}>
+                <Button variant="contained" onClick={() => navigate("/shipments/create")}>
                     Add Shipment
                 </Button>
             )

@@ -7,6 +7,7 @@ import ShipmentDetailsPage from "../features/shipments/ShipmentDetailsPage"
 import ShipmentsPage from "../features/shipments/ShipmentsPage"
 import { PageLayout } from "@/ui/PageLayout"
 import LogoutHandler from "./LogoutHandler"
+import CreateShipmentPage from "../features/shipments/create/CreateShipmentPage"
 
 export function AppRouter() {
     return (
@@ -21,6 +22,7 @@ export function AppRouter() {
                     <Route path="/" element={<DashboardPage />} />
                     <Route path="/shipments" element={<ShipmentsPage />} />
                     <Route path="/shipments/:id" element={<ShipmentDetailsPage />} />
+                    <Route path="/shipments/create" element={<CreateShipmentPage />} />
                 </Route>
                 <Route path="/logout" element={<LogoutHandler />} />
 
