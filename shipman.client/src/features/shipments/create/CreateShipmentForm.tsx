@@ -47,10 +47,11 @@ export default function CreateShipmentForm()
     const {
         register,
         handleSubmit,
-        formState: { errors },
+        formState: { errors, isValid },
         setError,
     } = useForm<CreateShipmentDto>({
         resolver: zodResolver(createShipmentSchema),
+        mode: "onChange"
     });
 
     const onSubmit = async (data: CreateShipmentDto) =>
@@ -234,7 +235,7 @@ export default function CreateShipmentForm()
                                 <Button
                                     variant="contained"
                                     type="submit"
-                                    disabled={isLoading}
+                                    disabled={!isValid || isLoading}
                                     size="large"
                                 >
                                     {isLoading ? <>Creating...<br /></> : <>Create <br /> Shipment</>}

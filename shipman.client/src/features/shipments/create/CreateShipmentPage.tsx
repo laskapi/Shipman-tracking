@@ -16,8 +16,8 @@ export default function CreateShipmentPage()
                 title: "Create Shipment",
                 subtitle: "",
                 breadcrumb: [{ label: "Shipments", to: "/shipments" },
-                {label:"Create Shipment"}],
-                actionsType: HeaderActionsType.ShipmentsList
+                    { label: "Create Shipment" }],
+                actionsType: HeaderActionsType.CreateShipment
             })
         )
     }, [dispatch])

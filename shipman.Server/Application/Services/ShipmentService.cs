@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using shipman.Server.Application.Dtos;
 using shipman.Server.Application.Dtos.Shipments;
+using shipman.Server.Application.Exceptions;
 using shipman.Server.Application.Interfaces;
 using shipman.Server.Application.Services;
 using shipman.Server.Data;
@@ -17,6 +18,7 @@ public class ShipmentService : IShipmentService
     private readonly IAppDbContext _db;
     private readonly INotificationService _notifications;
     private readonly GeocodingService _geocoding;
+
     public ShipmentService(
         ILogger<ShipmentService> logger,
         IAppDbContext db,
@@ -33,8 +35,32 @@ public class ShipmentService : IShipmentService
     {
         _logger.LogInformation("Creating new shipment for receiver {Receiver}", dto.Receiver.Name);
 
-        var (originLat, originLng) = await _geocoding.GeocodeAsync(dto.Sender.Address);
-        var (destLat, destLng) = await _geocoding.GeocodeAsync(dto.Receiver.Address);
+        double originLat, originLng;
+        double destLat, destLng;
+
+        try
+        {
+            (originLat, originLng) = await _geocoding.GeocodeAsync(dto.Sender.Address);
+        }
+        catch (Exception)
+        {
+            throw new AppValidationException(new Dictionary<string, string[]>
+            {
+                ["Sender.Address"] = new[] { "Address not found" }
+            });
+        }
+
+        try
+        {
+            (destLat, destLng) = await _geocoding.GeocodeAsync(dto.Receiver.Address);
+        }
+        catch (Exception)
+        {
+            throw new AppValidationException(new Dictionary<string, string[]>
+            {
+                ["Receiver.Address"] = new[] { "Address not found" }
+            });
+        }
 
         var sender = new Contact(
             dto.Sender.Name,
@@ -81,7 +107,7 @@ public class ShipmentService : IShipmentService
         catch (InvalidOperationException ex)
         {
             _logger.LogError(ex, "Failed to add Created event to shipment {ShipmentId}", shipment.Id);
-            throw;
+            throw new AppDomainException("Failed to create shipment event");
         }
 
         _db.Shipments.Add(shipment);
@@ -93,13 +119,12 @@ public class ShipmentService : IShipmentService
         return shipment;
     }
 
-
     public async Task<PagedResultDto<Shipment>> GetAllAsync(
-     int page,
-     int pageSize,
-     ShipmentFilterDto filter,
-     string sortBy,
-     string direction)
+        int page,
+        int pageSize,
+        ShipmentFilterDto filter,
+        string sortBy,
+        string direction)
     {
         _logger.LogInformation("Fetching shipments page {Page} with filter {Filter}", page, filter);
 
@@ -148,18 +173,21 @@ public class ShipmentService : IShipmentService
         };
     }
 
-
-    public async Task<Shipment?> GetByIdAsync(Guid id)
+    public async Task<Shipment> GetByIdAsync(Guid id)
     {
-        _logger.LogInformation("Fetching shipment {ShipmentId}", id);
-
-        return await _db.Shipments
+        var shipment = await _db.Shipments
             .AsNoTracking()
             .Include(s => s.Events)
             .FirstOrDefaultAsync(s => s.Id == id);
+
+        if (shipment == null)
+            throw new AppNotFoundException("Shipment not found");
+
+        return shipment;
     }
 
-    public async Task<Shipment?> AddEventAsync(Guid id, AddShipmentEventDto dto)
+
+    public async Task<Shipment> AddEventAsync(Guid id, AddShipmentEventDto dto)
     {
         _logger.LogInformation("Adding event {EventType} to shipment {ShipmentId}", dto.EventType, id);
 
@@ -168,10 +196,7 @@ public class ShipmentService : IShipmentService
             .FirstOrDefaultAsync(s => s.Id == id);
 
         if (shipment == null)
-        {
-            _logger.LogWarning("Shipment {ShipmentId} not found when adding event {EventType}", id, dto.EventType);
-            return null;
-        }
+            throw new AppNotFoundException("Shipment not found");
 
         var evt = new ShipmentEvent
         {
@@ -190,13 +215,11 @@ public class ShipmentService : IShipmentService
         catch (InvalidOperationException ex)
         {
             _logger.LogError(ex, "Invalid event sequence for shipment {ShipmentId}", id);
-            throw;
+            throw new AppDomainException("Invalid event sequence");
         }
 
         _db.ShipmentEvents.Add(evt);
         await _db.SaveChangesAsync();
-
-        _logger.LogInformation("Event {EventType} added to shipment {ShipmentId}", dto.EventType, id);
 
         switch (dto.EventType)
         {
@@ -212,8 +235,7 @@ public class ShipmentService : IShipmentService
         return shipment;
     }
 
-
-    public async Task<Shipment?> UpdateShipmentAsync(Guid id, UpdateShipmentDto dto)
+    public async Task<Shipment> UpdateShipmentAsync(Guid id, UpdateShipmentDto dto)
     {
         _logger.LogInformation("Updating shipment {ShipmentId}", id);
 
@@ -222,25 +244,27 @@ public class ShipmentService : IShipmentService
             .FirstOrDefaultAsync(s => s.Id == id);
 
         if (shipment == null)
-        {
-            _logger.LogWarning("Shipment {ShipmentId} not found for update", id);
-            return null;
-        }
+            throw new AppNotFoundException("Shipment not found");
 
         if (shipment.Status is ShipmentStatus.Delivered or ShipmentStatus.Cancelled)
-        {
-            _logger.LogWarning("Attempt to update completed shipment {ShipmentId}", id);
-            throw new InvalidOperationException("Cannot update a completed shipment.");
-        }
+            throw new AppDomainException("Cannot update a completed shipment");
 
         if (!string.IsNullOrWhiteSpace(dto.Destination))
         {
-            shipment.Receiver = shipment.Receiver with { Address = dto.Destination };
-
-            var (lat, lng) = await _geocoding.GeocodeAsync(dto.Destination);
-            shipment.DestinationCoordinates = new Coordinates(lat, lng);
+            try
+            {
+                var (lat, lng) = await _geocoding.GeocodeAsync(dto.Destination);
+                shipment.Receiver = shipment.Receiver with { Address = dto.Destination };
+                shipment.DestinationCoordinates = new Coordinates(lat, lng);
+            }
+            catch (Exception)
+            {
+                throw new AppValidationException(new Dictionary<string, string[]>
+                {
+                    ["Receiver.Address"] = new[] { "Address not found" }
+                });
+            }
         }
-
 
         if (dto.Weight.HasValue)
             shipment.Weight = dto.Weight.Value;
@@ -250,12 +274,10 @@ public class ShipmentService : IShipmentService
 
         await _db.SaveChangesAsync();
 
-        _logger.LogInformation("Shipment {ShipmentId} updated successfully", id);
-
         return shipment;
     }
 
-    public async Task<bool> DeleteShipmentAsync(Guid id)
+    public async Task DeleteShipmentAsync(Guid id)
     {
         _logger.LogInformation("Deleting shipment {ShipmentId}", id);
 
@@ -264,16 +286,11 @@ public class ShipmentService : IShipmentService
             .FirstOrDefaultAsync(s => s.Id == id);
 
         if (shipment == null)
-        {
-            _logger.LogWarning("Shipment {ShipmentId} not found for deletion", id);
-            return false;
-        }
+            throw new AppNotFoundException("Shipment not found");
 
         _db.Shipments.Remove(shipment);
         await _db.SaveChangesAsync();
 
-        _logger.LogInformation("Shipment {ShipmentId} deleted", id);
-
-        return true;
+        return;
     }
 }

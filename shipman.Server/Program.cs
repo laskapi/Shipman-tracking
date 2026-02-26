@@ -1,9 +1,9 @@
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using shipman.Server.Api.Middleware;
 using shipman.Server.Application.Interfaces;
 using shipman.Server.Application.Services;
 using shipman.Server.Data;
@@ -77,25 +77,7 @@ if (app.Environment.IsDevelopment())
         options.SwaggerEndpoint("/openapi/v1.json", "OpenAPI V1");
     });
 }
-app.UseExceptionHandler(errorApp =>
-{
-    errorApp.Run(async context =>
-    {
-        var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
-        var exception = context.Features.Get<IExceptionHandlerFeature>()?.Error;
-
-        logger.LogError(exception, "Unhandled exception occurred");
-
-        context.Response.StatusCode = 500;
-        context.Response.ContentType = "application/json";
-
-        await context.Response.WriteAsJsonAsync(new
-        {
-            error = "An unexpected error occurred. Please try again later."
-        });
-    });
-});
-
+app.UseAppExceptionHandling();
 app.UseCors();
 app.UseRouting();
 app.UseAuthentication();

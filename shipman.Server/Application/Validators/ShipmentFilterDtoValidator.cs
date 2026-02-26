@@ -1,6 +1,8 @@
 ﻿using FluentValidation;
+using shipman.Server.Domain.Enums;
 
 namespace shipman.Server.Application.Validators;
+
 public class ShipmentFilterDtoValidator : AbstractValidator<ShipmentFilterDto>
 {
     public ShipmentFilterDtoValidator()
@@ -10,7 +12,8 @@ public class ShipmentFilterDtoValidator : AbstractValidator<ShipmentFilterDto>
             .When(x => x.TrackingNumber != null);
 
         RuleFor(x => x.Status)
-            .IsInEnum()
-            .When(x => x.Status != null);
+     .Must(x => x == null || Enum.IsDefined(typeof(ShipmentStatus), x))
+     .WithMessage("Invalid shipment status");
+
     }
 }
