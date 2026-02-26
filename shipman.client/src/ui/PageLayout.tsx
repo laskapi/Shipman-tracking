@@ -5,18 +5,20 @@ import { HeaderActionsType } from "../app/headerSlice"
 import { PageHeader } from "./PageHeader"
 import type { RootState } from "../app/store"
 
-export function PageLayout() {
+export function PageLayout()
+{
     const header = useSelector((state: RootState) => state.header)
     const navigate = useNavigate()
     const { id } = useParams()
 
     let actions = null
 
-    switch (header.actionsType) {
+    switch (header.actionsType)
+    {
         case HeaderActionsType.ShipmentsList:
             actions = (
-                <Button variant="contained" onClick={() => navigate("/shipments/new")}>
-                    Add Shipment
+                <Button variant="contained" onClick={() => navigate("/shipments/create")}>
+                    Create Shipment
                 </Button>
             )
             break
@@ -54,6 +56,15 @@ export function PageLayout() {
                 </>
             )
             break
+        case HeaderActionsType.CreateShipment:
+            actions = (
+                <>
+                    <Button variant="outlined" onClick={() => navigate(-1)}>
+                        Back
+                    </Button>
+                   </>
+            )
+            break
     }
 
     return (
@@ -61,6 +72,7 @@ export function PageLayout() {
             sx={{
                 display: "grid",
                 gridTemplateRows: "auto 1fr",
+                height: "100vh"
 
             }}
         >
@@ -76,7 +88,6 @@ export function PageLayout() {
                 px: { xs: 0, md: 3 },
                 py: { xs: 0, md: 3 },
                 overflowY: { xs: "auto", md: "hidden" },
-                overflowX: "hidden",
             }}>
                 <Outlet />
             </Box>

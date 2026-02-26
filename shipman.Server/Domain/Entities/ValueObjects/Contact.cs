@@ -1,1 +1,1 @@
-﻿public record Contact(string Name,string Email,string Phone);
+﻿public record Contact(string Name, string Email, string Phone, string Address);

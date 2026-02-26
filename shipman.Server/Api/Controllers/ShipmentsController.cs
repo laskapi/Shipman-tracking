@@ -25,7 +25,7 @@ public class ShipmentsController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<ShipmentDetailsDto>> CreateShipment([FromBody] CreateShipmentDto dto)
     {
-        _logger.LogInformation("Received request to create shipment for {Receiver}", dto.ReceiverName);
+        _logger.LogInformation("Received request to create shipment for {Receiver}", dto.Receiver.Name);
 
         var shipment = await _service.CreateShipmentAsync(dto);
 
@@ -67,13 +67,6 @@ public class ShipmentsController : ControllerBase
         _logger.LogInformation("Fetching shipment {ShipmentId}", id);
 
         var shipment = await _service.GetByIdAsync(id);
-
-        if (shipment == null)
-        {
-            _logger.LogWarning("Shipment {ShipmentId} not found", id);
-            return NotFound();
-        }
-
         return shipment.ToDetailsDto();
     }
 
@@ -83,13 +76,6 @@ public class ShipmentsController : ControllerBase
         _logger.LogInformation("Adding event {EventType} to shipment {ShipmentId}", dto.EventType, id);
 
         var shipment = await _service.AddEventAsync(id, dto);
-
-        if (shipment == null)
-        {
-            _logger.LogWarning("Shipment {ShipmentId} not found when adding event", id);
-            return NotFound("Shipment not found.");
-        }
-
         return shipment.ToDetailsDto();
     }
 
@@ -99,14 +85,7 @@ public class ShipmentsController : ControllerBase
         _logger.LogInformation("Cancelling shipment {ShipmentId}", id);
 
         var dto = new AddShipmentEventDto(ShipmentEventType.Cancelled);
-
         var shipment = await _service.AddEventAsync(id, dto);
-
-        if (shipment == null)
-        {
-            _logger.LogWarning("Shipment {ShipmentId} not found for cancellation", id);
-            return NotFound("Shipment not found.");
-        }
 
         return shipment.ToDetailsDto();
     }
@@ -117,13 +96,6 @@ public class ShipmentsController : ControllerBase
         _logger.LogInformation("Updating shipment {ShipmentId}", id);
 
         var shipment = await _service.UpdateShipmentAsync(id, dto);
-
-        if (shipment == null)
-        {
-            _logger.LogWarning("Shipment {ShipmentId} not found for update", id);
-            return NotFound("Shipment not found.");
-        }
-
         return shipment.ToDetailsDto();
     }
 
@@ -132,14 +104,7 @@ public class ShipmentsController : ControllerBase
     {
         _logger.LogInformation("Deleting shipment {ShipmentId}", id);
 
-        var deleted = await _service.DeleteShipmentAsync(id);
-
-        if (!deleted)
-        {
-            _logger.LogWarning("Shipment {ShipmentId} not found for deletion", id);
-            return NotFound("Shipment not found.");
-        }
-
+        await _service.DeleteShipmentAsync(id);
         return NoContent();
     }
 }

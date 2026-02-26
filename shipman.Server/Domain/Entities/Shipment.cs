@@ -8,18 +8,17 @@ public class Shipment
 {
     public Guid Id { get; set; }
     public string TrackingNumber { get; set; } = default!;
+
     public Contact Sender { get; set; } = default!;
     public Contact Receiver { get; set; } = default!;
-    
-    public string Origin { get; set; } = default!;
-    public Coordinates OriginCoordinates { get; set; } = default!;
 
-    public string Destination { get; set; } = default!;
+    public Coordinates OriginCoordinates { get; set; } = default!;
     public Coordinates DestinationCoordinates { get; set; } = default!;
 
     public decimal Weight { get; set; }
     public ServiceType ServiceType { get; set; } = ServiceType.Standard;
     public ShipmentStatus Status { get; set; } = ShipmentStatus.Processing;
+
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? EstimatedDelivery { get; set; }

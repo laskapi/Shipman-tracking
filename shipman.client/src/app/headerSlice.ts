@@ -4,7 +4,8 @@ export enum HeaderActionsType {
     None = "none",
     ShipmentsList = "shipmentsList",
     ShipmentDetails = "shipmentDetails",
-    Dashboard = "dashboard"
+    Dashboard = "dashboard",
+    CreateShipment="createShipment"
 }
 
 export interface HeaderState {

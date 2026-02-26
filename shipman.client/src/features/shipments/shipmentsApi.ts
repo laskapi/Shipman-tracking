@@ -1,14 +1,6 @@
-import type { PagedResult, Shipment, ShipmentDetails, ShipmentListItem, ShipmentsQueryParams, MetadataOptionDto } from "./types"
-import { api } from "@/services/api"
-export interface CreateShipmentRequest {
-    trackingNumber: string
-    sender: string
-    receiver: string
-}
-export interface UpdateShipmentStatusRequest {
-    id: string
-    status: string
-}
+import { api } from "@/services/api";
+import type { CreateShipmentRequest, MetadataOptionDto, PagedResult, Shipment, ShipmentDetails, ShipmentListItem, ShipmentsQueryParams } from "./types";
+
 
 export const shipmentsApi = api.injectEndpoints({
     endpoints: builder => ({
@@ -26,7 +18,8 @@ export const shipmentsApi = api.injectEndpoints({
                 url: "shipments",
                 method: "POST",
                 body
-            })
+            }),
+            invalidatesTags: ["Shipment"]
         }),
 
         addShipmentEvent: builder.mutation<ShipmentDetails, {
