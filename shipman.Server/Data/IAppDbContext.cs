@@ -9,6 +9,5 @@ public interface IAppDbContext
     DbSet<Shipment> Shipments { get; }
     DbSet<ShipmentEvent> ShipmentEvents { get; }
     DbSet<GeocodingCache> GeocodingCache { get; }
-
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

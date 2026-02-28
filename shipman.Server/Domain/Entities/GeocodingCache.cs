@@ -1,4 +1,6 @@
-﻿public class GeocodingCache
+namespace shipman.Server.Domain.Entities;
+
+public class GeocodingCache
 {
     public int Id { get; set; }
     public string AddressKey { get; set; } = default!;
