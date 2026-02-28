@@ -3,7 +3,7 @@ using shipman.Server.Application.Dtos;
 using shipman.Server.Application.Dtos.Shipments;
 using shipman.Server.Application.Exceptions;
 using shipman.Server.Application.Interfaces;
-using shipman.Server.Application.Services;
+using shipman.Server.Application.Services.Geocoding;
 using shipman.Server.Data;
 using shipman.Server.Domain.Entities;
 using shipman.Server.Domain.Entities.ValueObjects;
@@ -35,47 +35,43 @@ public class ShipmentService : IShipmentService
     {
         _logger.LogInformation("Creating new shipment for receiver {Receiver}", dto.Receiver.Name);
 
-        double originLat, originLng;
-        double destLat, destLng;
-
+        GeocodeResult senderGeo;
+        GeocodeResult receiverGeo;
         try
         {
-            (originLat, originLng) = await _geocoding.GeocodeAsync(dto.Sender.Address);
+            senderGeo = await _geocoding.GeocodeAsync(dto.Sender.Address);
         }
-        catch (Exception)
+        catch
         {
             throw new AppValidationException(new Dictionary<string, string[]>
             {
                 ["Sender.Address"] = new[] { "Address not found" }
             });
         }
-
         try
         {
-            (destLat, destLng) = await _geocoding.GeocodeAsync(dto.Receiver.Address);
+            receiverGeo = await _geocoding.GeocodeAsync(dto.Receiver.Address);
         }
-        catch (Exception)
+        catch
         {
             throw new AppValidationException(new Dictionary<string, string[]>
             {
                 ["Receiver.Address"] = new[] { "Address not found" }
             });
         }
-
         var sender = new Contact(
             dto.Sender.Name,
             dto.Sender.Email,
             dto.Sender.Phone,
-            dto.Sender.Address
+            senderGeo.FormattedAddress
         );
 
         var receiver = new Contact(
             dto.Receiver.Name,
             dto.Receiver.Email,
             dto.Receiver.Phone,
-            dto.Receiver.Address
+            receiverGeo.FormattedAddress
         );
-
         var shipment = new Shipment
         {
             Id = Guid.NewGuid(),
@@ -84,32 +80,22 @@ public class ShipmentService : IShipmentService
             Sender = sender,
             Receiver = receiver,
 
-            OriginCoordinates = new Coordinates(originLat, originLng),
-            DestinationCoordinates = new Coordinates(destLat, destLng),
+            OriginCoordinates = new Coordinates(senderGeo.Lat, senderGeo.Lng),
+            DestinationCoordinates = new Coordinates(receiverGeo.Lat, receiverGeo.Lng),
 
             Weight = dto.Weight,
             ServiceType = dto.ServiceType
         };
 
         shipment.CalculateEstimatedDelivery();
-
-        try
+        shipment.AddEvent(new ShipmentEvent
         {
-            shipment.AddEvent(new ShipmentEvent
-            {
-                Id = Guid.NewGuid(),
-                Timestamp = DateTime.UtcNow,
-                EventType = ShipmentEventType.Created,
-                Location = dto.Sender.Address,
-                Description = "Shipment created"
-            });
-        }
-        catch (InvalidOperationException ex)
-        {
-            _logger.LogError(ex, "Failed to add Created event to shipment {ShipmentId}", shipment.Id);
-            throw new AppDomainException("Failed to create shipment event");
-        }
-
+            Id = Guid.NewGuid(),
+            Timestamp = DateTime.UtcNow,
+            EventType = ShipmentEventType.Created,
+            Location = senderGeo.FormattedAddress,
+            Description = "Shipment created"
+        });
         _db.Shipments.Add(shipment);
         await _db.SaveChangesAsync();
 
@@ -118,6 +104,7 @@ public class ShipmentService : IShipmentService
         await _notifications.ShipmentCreatedAsync(shipment);
         return shipment;
     }
+
 
     public async Task<PagedResultDto<Shipment>> GetAllAsync(
         int page,
@@ -253,9 +240,9 @@ public class ShipmentService : IShipmentService
         {
             try
             {
-                var (lat, lng) = await _geocoding.GeocodeAsync(dto.Destination);
+                var result = await _geocoding.GeocodeAsync(dto.Destination);
                 shipment.Receiver = shipment.Receiver with { Address = dto.Destination };
-                shipment.DestinationCoordinates = new Coordinates(lat, lng);
+                shipment.DestinationCoordinates = new Coordinates(result.Lat, result.Lng);
             }
             catch (Exception)
             {
