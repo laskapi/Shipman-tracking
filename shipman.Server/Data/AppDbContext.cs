@@ -10,6 +10,8 @@ public class AppDbContext : DbContext, IAppDbContext
     public virtual DbSet<AppUser> Users { get; set; } = default!;
     public virtual DbSet<Shipment> Shipments { get; set; } = default!;
     public virtual DbSet<ShipmentEvent> ShipmentEvents { get; set; } = default!;
+    public DbSet<GeocodingCache> GeocodingCache { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
