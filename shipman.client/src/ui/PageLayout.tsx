@@ -26,7 +26,7 @@ export function PageLayout()
         case HeaderActionsType.ShipmentDetails:
             actions = (
                 <>
-                    <Button variant="outlined" onClick={() => navigate(-1)}>
+                    <Button variant="outlined" onClick={() => navigate("/shipments")}>
                         Back
                     </Button>
                     <Button

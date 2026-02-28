@@ -50,7 +50,8 @@ export default function ShipmentDetailsPage()
                     md: "3fr 1fr",
                 },
                 gap: 2,
-                p: 2,
+                px: 2,
+                height: { xs: "auto", md: "100%" }, 
                 alignItems: "stretch",
                 overflowY: { xs: "auto", md: "hidden" }
 
@@ -112,14 +113,15 @@ export default function ShipmentDetailsPage()
                     p: 2,
                     display: "flex",
                     flexDirection: "column",
-                    gap: 2,
+                    overflow: "hidden",
+                    gap: 1,
                 }}
             >
                 <Box
                     sx={{
                         width: "100%",
                         maxWidth: "100%",
-                        aspectRatio: "1 / 1",
+                        aspectRatio: { xs: "16 / 9", md: "1 / 1" },
                     }}
                 >
                     <ShipmentMapPreview
@@ -127,7 +129,7 @@ export default function ShipmentDetailsPage()
                         destination={shipment.destinationCoordinates}
                     />
                 </Box>
-
+                {/* SCROLLABLE DETAILS */}
                 <ShipmentRouteDetails shipment={shipment} />
             </Paper>
         </Box>
