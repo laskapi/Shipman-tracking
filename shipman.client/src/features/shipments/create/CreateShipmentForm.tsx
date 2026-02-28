@@ -78,8 +78,8 @@ export default function CreateShipmentForm()
                         const formKey = key
                             .replace("Sender.", "sender.")
                             .replace("Receiver.", "receiver.")
-                            .replace("Weight", "weight")
-                            .replace("ServiceType", "serviceType");
+                            .replace(/\.([A-Z])/g, (_, c) => "." + c.toLowerCase());
+
 
                         setError(formKey as keyof CreateShipmentDto, {
                             type: "server",
