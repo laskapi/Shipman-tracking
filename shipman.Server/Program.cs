@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using shipman.Server.Api.Middleware;
 using shipman.Server.Application.Interfaces;
 using shipman.Server.Application.Services;
+using shipman.Server.Application.Services.Geocoding;
 using shipman.Server.Data;
 using shipman.Server.Infrastructure.Mail;
 using System.Text.Json.Serialization;
