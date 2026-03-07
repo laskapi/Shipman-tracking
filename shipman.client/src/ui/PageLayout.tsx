@@ -65,6 +65,15 @@ export function PageLayout()
                    </>
             )
             break
+        case HeaderActionsType.EditShipment:
+            actions = (
+                <>
+                    <Button variant="outlined" onClick={() => navigate(-1)}>
+                        Back
+                    </Button>
+                </>
+            )
+            break
     }
 
     return (

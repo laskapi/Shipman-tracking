@@ -10,12 +10,11 @@ import { useForm } from "react-hook-form";
 
 import
     {
-        createShipmentSchema,
-        type CreateShipmentDto,
-    } from "./createShipmentSchema";
+        editShipmentSchema,
+        type EditShipmentDto
+    } from "./editShipmentSchema";
 
 import { PersonFields } from "../components/forms/PersonFields";
-import { WeightField } from "../components/forms/WeightField";
 import { ServiceTypeField } from "../components/forms/ServiceTypeField";
 
 import { FormCard } from "../components/forms/FormCard";
@@ -23,12 +22,12 @@ import { FormAction } from "../components/forms/FormAction";
 
 interface Props
 {
-    initialValues: CreateShipmentDto;
-    onSubmit: (values: CreateShipmentDto) => Promise<void>;
+    initialValues: EditShipmentDto;
+    onSubmit: (values: EditShipmentDto) => Promise<void>;
     isLoading: boolean;
 }
 
-export default function CreateShipmentForm({
+export default function EditShipmentForm({
     initialValues,
     onSubmit,
     isLoading
@@ -38,8 +37,8 @@ export default function CreateShipmentForm({
         register,
         handleSubmit,
         formState: { errors, isValid },
-    } = useForm<CreateShipmentDto>({
-        resolver: zodResolver(createShipmentSchema),
+    } = useForm<EditShipmentDto>({
+        resolver: zodResolver(editShipmentSchema),
         mode: "onChange",
         defaultValues: initialValues
     });
@@ -49,19 +48,8 @@ export default function CreateShipmentForm({
             <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
                 <Grid container spacing={2}>
 
-                    {/* Sender */}
-                    <Grid size={{ xs: 12, md: 4 }}>
-                        <FormCard title="Sender">
-                            <PersonFields
-                                register={register}
-                                errors={errors}
-                                prefix="sender"
-                            />
-                        </FormCard>
-                    </Grid>
-
                     {/* Receiver */}
-                    <Grid size={{ xs: 12, md: 4 }}>
+                    <Grid size={{ xs: 12, md: 6 }}>
                         <FormCard title="Receiver">
                             <PersonFields
                                 register={register}
@@ -72,11 +60,10 @@ export default function CreateShipmentForm({
                     </Grid>
 
                     {/* Shipment Details */}
-                    <Grid size={{ xs: 12, md: 4 }}>
+                    <Grid size={{ xs: 12, md: 6 }}>
                         <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
                             <FormCard title="Shipment Details">
                                 <Stack spacing={1}>
-                                    <WeightField register={register} errors={errors} />
                                     <ServiceTypeField register={register} errors={errors} />
                                 </Stack>
                             </FormCard>
@@ -84,7 +71,7 @@ export default function CreateShipmentForm({
                             <FormAction
                                 isValid={isValid}
                                 isLoading={isLoading}
-                                label="Create Shipment"
+                                label="Update Shipment"
                             />
                         </Box>
                     </Grid>

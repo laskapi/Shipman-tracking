@@ -5,6 +5,8 @@ export interface ShipmentEvent {
     description: string;
 }
 
+export type ServiceType = "Standard" | "Express" | "Freight";
+
 export interface ShipmentDetails {
     id: string;
     trackingNumber: string;
@@ -16,7 +18,7 @@ export interface ShipmentDetails {
     destinationCoordinates: CoordinatesDto;
 
     weight: number;
-    serviceType: string;
+    serviceType: ServiceType;
     status: string;
 
     origin: string;
@@ -33,6 +35,7 @@ export interface ContactDto {
     name: string;
     email: string;
     phone: string;
+    address: string;
 }
 
 export interface CoordinatesDto {
@@ -40,7 +43,7 @@ export interface CoordinatesDto {
     lng: number;
 }
 
-export interface ShipmentListItem {
+export interface Shipment {
     id: string
     trackingNumber: string
     sender: string
@@ -68,14 +71,7 @@ export interface ShipmentsQueryParams {
     sortBy?: string
     direction?: "asc" | "desc"
 }
-export interface Shipment {
-    id: string
-    trackingNumber: string
-    sender: string
-    receiver: string
-    status: string
-    createdAt: string
-}
+
 export interface MetadataOptionDto {
     value: string
     label: string
@@ -94,7 +90,7 @@ export interface ShipmentsToolbarController {
 }
 
 export interface ShipmentsController {
-    data: { items: ShipmentListItem[]; totalCount: number } | undefined
+    data: { items: Shipment[]; totalCount: number } | undefined
     statuses: MetadataOptionDto[]
     status: string
     search: string
@@ -114,22 +110,6 @@ export interface ShipmentsController {
     handleRowClick: (params: { id: string | number }) => void
 
     toolbar: ShipmentsToolbarController
-}
-
-export interface ContactRequest
-{
-    name: string;
-    email: string;
-    phone: string;
-    address: string;
-}
-
-export interface CreateShipmentRequest
-{
-    sender: ContactRequest;
-    receiver: ContactRequest;
-    weight: number;
-    serviceType: "Standard" | "Express" | "Priority";
 }
 
 export interface UpdateShipmentStatusRequest

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using shipman.Server.Application.Exceptions;
 using shipman.Server.Data;
+using shipman.Server.Domain.Entities;
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;

@@ -1,13 +1,21 @@
 import { Box, Card, CardContent, Container } from "@mui/material";
 import { useDispatch } from "react-redux";
-import CreateShipmentForm from "./CreateShipmentForm";
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+
 import { setHeader, HeaderActionsType } from "@/app/headerSlice";
+import { shipmentsApi, useCreateShipmentMutation } from "../shipmentsApi";
+
+import CreateShipmentForm from "./CreateShipmentForm";
+import type { CreateShipmentDto } from "../create/createShipmentSchema";
+import type { AppDispatch } from "../../../app/store";
 
 export default function CreateShipmentPage()
 {
+    const navigate = useNavigate();
+    const dispatch = useDispatch<AppDispatch>();
 
-    const dispatch = useDispatch()
+    const [createShipment, { isLoading }] = useCreateShipmentMutation();
 
     useEffect(() =>
     {
@@ -15,19 +23,56 @@ export default function CreateShipmentPage()
             setHeader({
                 title: "Create Shipment",
                 subtitle: "",
-                breadcrumb: [{ label: "Shipments", to: "/shipments" },
-                    { label: "Create Shipment" }],
+                breadcrumb: [
+                    { label: "Shipments", to: "/shipments" },
+                    { label: "Create Shipment" }
+                ],
                 actionsType: HeaderActionsType.CreateShipment
             })
-        )
-    }, [dispatch])
+        );
+    }, [dispatch]);
+
+    const handleCreate = async (values: CreateShipmentDto) =>
+    {
+        const shipment = await createShipment(values).unwrap();
+
+        dispatch(
+            shipmentsApi.util.updateQueryData(
+                "getShipmentById",
+                shipment.id,
+                draft => Object.assign(draft, shipment)
+            )
+        );
+
+        navigate(`/shipments/${shipment.id}`);
+    };
+
     return (
         <Box>
             <Container maxWidth="md">
                 <Box display="flex" justifyContent="center" mt={4}>
                     <Card sx={{ width: "100%", p: 2 }}>
                         <CardContent>
-                            <CreateShipmentForm />
+                            <CreateShipmentForm
+                                onSubmit={handleCreate}
+                                isLoading={isLoading}
+                                initialValues={{
+                                    sender: {
+                                        name: "",
+                                        email: "",
+                                        phone: "",
+                                        address: ""
+                                    },
+                                    receiver: {
+                                        name: "",
+                                        email: "",
+                                        phone: "",
+                                        address: ""
+                                    },
+                                    weight: 0,
+                                    serviceType: "Standard"
+                                }}
+                            />
                         </CardContent>
                     </Card>
                 </Box>
