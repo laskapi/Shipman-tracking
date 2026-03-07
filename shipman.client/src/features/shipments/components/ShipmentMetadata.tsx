@@ -1,6 +1,6 @@
-import { Paper, Typography, Grid } from "@mui/material";
 import type { ShipmentDetails } from "@/features/shipments/types";
 import PanelHeader from "@/ui/PanelHeader";
+import { Grid, Typography } from "@mui/material";
 
 export default function ShipmentMetadata({ shipment }: { shipment: ShipmentDetails })
 {

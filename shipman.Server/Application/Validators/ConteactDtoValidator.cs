@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using shipman.Server.Application.Dtos.Shipments;
 
 namespace shipman.Server.Application.Validators;
 

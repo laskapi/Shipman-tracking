@@ -45,7 +45,6 @@ public class ShipmentsController : ControllerBase
         string direction = "desc")
     {
         _logger.LogInformation("Fetching shipments page {Page}", page);
-
         filter ??= new ShipmentFilterDto();
         var result = await _service.GetAllAsync(page, pageSize, filter, sortBy, direction);
 
@@ -57,7 +56,6 @@ public class ShipmentsController : ControllerBase
             TotalCount = result.TotalCount,
             TotalPages = result.TotalPages
         };
-
         return Ok(dto);
     }
 

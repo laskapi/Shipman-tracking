@@ -19,9 +19,8 @@ export const contactSchema = z.object({
     address: z
         .string()
         .min(1, "Address is required")
-        .transform(normalizeAddress),
+        .transform(normalizeAddress)
 });
-
 
 export const createShipmentSchema = z.object({
     sender: contactSchema,
@@ -32,7 +31,7 @@ export const createShipmentSchema = z.object({
             invalid_type_error: "Weight must be a number",
         })
         .positive("Weight must be greater than 0"),
-    serviceType: z.enum(["Standard", "Express", "Priority"]),
+    serviceType: z.enum(["Standard", "Express", "Freight"])
 });
 
 export type CreateShipmentDto = z.infer<typeof createShipmentSchema>;
