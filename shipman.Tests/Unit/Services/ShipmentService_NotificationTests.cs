@@ -1,69 +1,57 @@
 ﻿using Moq;
-using shipman.Server.Domain.Entities;
 using shipman.Server.Domain.Enums;
-using shipman.Tests.TestUtils;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using shipman.Tests.Unit.Dtos;
 
-namespace shipman.Tests.Unit.Services
+namespace shipman.Tests.Unit.Services;
+
+public class ShipmentService_NotificationTests
 {
-    public class ShipmentService_NotificationTests
+    [Fact]
+    public async Task CreateShipment_SendsCreatedNotification()
     {
-        [Fact]
-        public async Task CreateShipment_SendsCreatedNotification()
-        {
-            await using var db = InMemoryDbContextFactory.Create();
+        await using var db = InMemoryDbContextFactory.Create();
 
-            var mock = NotificationMockFactory.CreateMock();
-            var service = ServiceDataFactory.CreateService(db, mock.Object);
+        var (sender, receiver) = await ServiceFactory.SeedContactsAsync(db);
 
-            var dto = DtoFactory.CreateShipment();
+        var mock = ServiceFactory.MockNotifications();
+        var service = ServiceFactory.Create(db, mock.Object);
 
-            var result = await service.CreateShipmentAsync(dto);
+        var dto = DtoFactory.CreateShipment(sender.Id, receiver.Id);
 
-            mock.Verify(x => x.ShipmentCreatedAsync(It.IsAny<Shipment>()), Times.Once);
-        }
+        var result = await service.CreateShipmentAsync(dto);
 
-        [Fact]
-        public async Task AddEventAsync_DeliveredEvent_SendsDeliveredNotification()
-        {
-            await using var db = InMemoryDbContextFactory.Create();
+        mock.Verify(x => x.ShipmentCreatedAsync(It.IsAny<shipman.Server.Domain.Entities.Shipment>()), Times.Once);
+    }
 
-            var shipment = ServiceDataFactory.CreateShipment();
-            db.Shipments.Add(shipment);
-            await db.SaveChangesAsync();
+    [Fact]
+    public async Task AddEventAsync_DeliveredEvent_SendsDeliveredNotification()
+    {
+        await using var db = InMemoryDbContextFactory.Create();
 
-            var mock = NotificationMockFactory.CreateMock();
-            var service = ServiceDataFactory.CreateService(db, mock.Object);
+        var shipment = await ServiceFactory.SeedShipmentAsync(db);
 
-            await EventChainHelper.AddFullDeliveryChainAsync(service, shipment.Id);
-            await service.AddEventAsync(shipment.Id, DtoFactory.CreateEventDto(ShipmentEventType.Delivered));
+        var mock = ServiceFactory.MockNotifications();
+        var service = ServiceFactory.Create(db, mock.Object);
 
-            mock.Verify(x => x.ShipmentDeliveredAsync(It.IsAny<Shipment>()), Times.Once);
-        }
+        await EventChainHelper.AddFullDeliveryChainAsync(service, shipment.Id);
 
+        mock.Verify(x => x.ShipmentDeliveredAsync(It.IsAny<shipman.Server.Domain.Entities.Shipment>()), Times.Once);
+    }
 
-        [Fact]
-        public async Task AddEventAsync_CancelledEvent_SendsCancelledNotification()
-        {
-            await using var db = InMemoryDbContextFactory.Create();
+    [Fact]
+    public async Task AddEventAsync_CancelledEvent_SendsCancelledNotification()
+    {
+        await using var db = InMemoryDbContextFactory.Create();
 
-            var shipment = ServiceDataFactory.CreateShipment();
-            db.Shipments.Add(shipment);
-            await db.SaveChangesAsync();
+        var shipment = await ServiceFactory.SeedShipmentAsync(db);
 
-            var mock = NotificationMockFactory.CreateMock();
-            var service = ServiceDataFactory.CreateService(db, mock.Object);
+        var mock = ServiceFactory.MockNotifications();
+        var service = ServiceFactory.Create(db, mock.Object);
 
-            var dto = DtoFactory.CreateEventDto(ShipmentEventType.Cancelled);
+        var dto = DtoFactory.CreateEvent(ShipmentEventType.Cancelled);
 
-            await service.AddEventAsync(shipment.Id, dto);
+        await service.AddEventAsync(shipment.Id, dto);
 
-            mock.Verify(x => x.ShipmentCancelledAsync(It.IsAny<Shipment>()), Times.Once);
-        }
-
-
-
+        mock.Verify(x => x.ShipmentCancelledAsync(It.IsAny<shipman.Server.Domain.Entities.Shipment>()), Times.Once);
     }
 }

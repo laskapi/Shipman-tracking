@@ -1,12 +1,15 @@
+using AutoMapper;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging.Abstractions;
 using shipman.Server.Api.Middleware;
 using shipman.Server.Application.Interfaces;
 using shipman.Server.Application.Services;
+using shipman.Server.Application.Services.Addresses;
 using shipman.Server.Application.Services.Geocoding;
+using shipman.Server.Application.Services.Shipments;
 using shipman.Server.Data;
 using shipman.Server.Infrastructure.Mail;
 using System.Text.Json.Serialization;
@@ -29,7 +32,10 @@ builder.Services.AddScoped<IMailSender>(sp =>
     return new MailSenderLoggingDecorator(logger, inner);
 });
 builder.Services.AddScoped<INotificationService, NotificationService>();
-
+builder.Services.AddScoped<ShipmentFactory>();
+builder.Services.AddScoped<ShipmentUpdater>();
+builder.Services.AddScoped<AddressService>();
+builder.Services.AddScoped<IGeocodingService, GeocodingService>();
 builder.Services.AddHttpClient<GeocodingService>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
@@ -61,6 +67,18 @@ builder.Services.AddControllers()
     });
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+
+var loggerFactory = NullLoggerFactory.Instance;
+builder.Services.AddSingleton<IMapper>(sp =>
+{
+    var config = new MapperConfiguration(cfg =>
+    {
+        cfg.AddMaps(typeof(Program).Assembly);
+    }, loggerFactory);
+
+    return config.CreateMapper();
+});
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())

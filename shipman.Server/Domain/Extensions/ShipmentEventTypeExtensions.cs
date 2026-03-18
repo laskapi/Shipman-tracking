@@ -4,51 +4,27 @@ namespace shipman.Server.Domain.Extensions;
 
 public static class ShipmentEventTypeExtensions
 {
-    public static ShipmentStatus ToStatus(this ShipmentEventType eventType)
-    {
-        return eventType switch
+    public static ShipmentStatus ToStatus(this ShipmentEventType type) =>
+        type switch
         {
-            ShipmentEventType.Created => ShipmentStatus.Processing,
-            ShipmentEventType.PickedUp => ShipmentStatus.Shipped,
-            ShipmentEventType.InTransit => ShipmentStatus.InTransit,
-            ShipmentEventType.ArrivedAtFacility => ShipmentStatus.InTransit,
-            ShipmentEventType.DepartedFacility => ShipmentStatus.InTransit,
-            ShipmentEventType.OutForDelivery => ShipmentStatus.InTransit,
+            ShipmentEventType.Created => ShipmentStatus.Created,
+            ShipmentEventType.Prepared => ShipmentStatus.Prepared,
+            ShipmentEventType.HandedOver => ShipmentStatus.HandedOver,
             ShipmentEventType.Delivered => ShipmentStatus.Delivered,
+            ShipmentEventType.Delayed => ShipmentStatus.Delayed,
             ShipmentEventType.Cancelled => ShipmentStatus.Cancelled,
-            _ => ShipmentStatus.Processing
+            _ => ShipmentStatus.Created
         };
-    }
 
-    public static string ToDescription(this ShipmentEventType type)
-    {
-        return type switch
+    public static string ToDescription(this ShipmentEventType type) =>
+        type switch
         {
-            ShipmentEventType.Created =>
-                "Shipment was created",
-
-            ShipmentEventType.PickedUp =>
-                "Shipment was picked up",
-
-            ShipmentEventType.InTransit =>
-                "Shipment is in transit",
-
-            ShipmentEventType.ArrivedAtFacility =>
-                "Shipment arrived at a facility",
-
-            ShipmentEventType.DepartedFacility =>
-                "Shipment departed a facility",
-
-            ShipmentEventType.OutForDelivery =>
-                "Shipment is out for delivery",
-
-            ShipmentEventType.Delivered =>
-                "Shipment was delivered",
-
-            ShipmentEventType.Cancelled =>
-                "Shipment was cancelled",
-
+            ShipmentEventType.Created => "Shipment was created",
+            ShipmentEventType.Prepared => "Shipment was prepared",
+            ShipmentEventType.HandedOver => "Shipment was handed over",
+            ShipmentEventType.Delivered => "Shipment was delivered",
+            ShipmentEventType.Delayed => "Shipment was delayed",
+            ShipmentEventType.Cancelled => "Shipment was cancelled",
             _ => "Shipment event occurred"
         };
-    }
 }

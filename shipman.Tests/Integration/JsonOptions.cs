@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace shipman.Tests.TestUtils;
+namespace shipman.Tests.Integration;
 
 public static class TestJson
 {

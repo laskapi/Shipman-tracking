@@ -15,9 +15,115 @@ namespace shipman.Server.Data.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "10.0.3");
+            modelBuilder.HasAnnotation("ProductVersion", "10.0.5");
 
-            modelBuilder.Entity("GeocodingCache", b =>
+            modelBuilder.Entity("shipman.Server.Domain.Entities.Address", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ApartmentNumber")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Country")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("HouseNumber")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<double>("Latitude")
+                        .HasColumnType("REAL");
+
+                    b.Property<double>("Longitude")
+                        .HasColumnType("REAL");
+
+                    b.Property<string>("PostalCode")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Street")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Addresses", (string)null);
+                });
+
+            modelBuilder.Entity("shipman.Server.Domain.Entities.AppUser", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<byte[]>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("BLOB");
+
+                    b.Property<byte[]>("PasswordSalt")
+                        .IsRequired()
+                        .HasColumnType("BLOB");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("shipman.Server.Domain.Entities.Contact", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("PrimaryAddressId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PrimaryAddressId");
+
+                    b.ToTable("Contacts", (string)null);
+                });
+
+            modelBuilder.Entity("shipman.Server.Domain.Entities.ContactDestinationAddress", b =>
+                {
+                    b.Property<Guid>("ContactId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("AddressId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("ContactId", "AddressId");
+
+                    b.HasIndex("AddressId");
+
+                    b.ToTable("ContactDestinationAddresses", (string)null);
+                });
+
+            modelBuilder.Entity("shipman.Server.Domain.Entities.GeocodingCache", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -45,83 +151,6 @@ namespace shipman.Server.Data.Migrations
                     b.ToTable("GeocodingCache");
                 });
 
-            modelBuilder.Entity("ShipmentEvent", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("EventType")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Location")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("ShipmentId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("Timestamp")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ShipmentId");
-
-                    b.ToTable("ShipmentEvents");
-                });
-
-            modelBuilder.Entity("shipman.Server.Domain.Entities.AppUser", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<byte[]>("PasswordHash")
-                        .IsRequired()
-                        .HasColumnType("BLOB");
-
-                    b.Property<byte[]>("PasswordSalt")
-                        .IsRequired()
-                        .HasColumnType("BLOB");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("shipman.Server.Domain.Entities.GeocodingCache", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("CachedAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<double>("Lat")
-                        .HasColumnType("REAL");
-
-                    b.Property<double>("Lng")
-                        .HasColumnType("REAL");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("GeocodingCache");
-                });
-
             modelBuilder.Entity("shipman.Server.Domain.Entities.Shipment", b =>
                 {
                     b.Property<Guid>("Id")
@@ -131,7 +160,16 @@ namespace shipman.Server.Data.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid>("DestinationAddressId")
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime?>("EstimatedDelivery")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ReceiverId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("SenderId")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("ServiceType")
@@ -152,10 +190,101 @@ namespace shipman.Server.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Shipments");
+                    b.HasIndex("DestinationAddressId");
+
+                    b.HasIndex("ReceiverId");
+
+                    b.HasIndex("SenderId");
+
+                    b.ToTable("Shipments", (string)null);
                 });
 
-            modelBuilder.Entity("ShipmentEvent", b =>
+            modelBuilder.Entity("shipman.Server.Domain.Entities.ShipmentEvent", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("EventType")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Location")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ShipmentId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ShipmentId");
+
+                    b.ToTable("ShipmentEvents");
+                });
+
+            modelBuilder.Entity("shipman.Server.Domain.Entities.Contact", b =>
+                {
+                    b.HasOne("shipman.Server.Domain.Entities.Address", "PrimaryAddress")
+                        .WithMany()
+                        .HasForeignKey("PrimaryAddressId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("PrimaryAddress");
+                });
+
+            modelBuilder.Entity("shipman.Server.Domain.Entities.ContactDestinationAddress", b =>
+                {
+                    b.HasOne("shipman.Server.Domain.Entities.Address", "Address")
+                        .WithMany("ContactLinks")
+                        .HasForeignKey("AddressId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("shipman.Server.Domain.Entities.Contact", "Contact")
+                        .WithMany("DestinationAddresses")
+                        .HasForeignKey("ContactId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Address");
+
+                    b.Navigation("Contact");
+                });
+
+            modelBuilder.Entity("shipman.Server.Domain.Entities.Shipment", b =>
+                {
+                    b.HasOne("shipman.Server.Domain.Entities.Address", "DestinationAddress")
+                        .WithMany()
+                        .HasForeignKey("DestinationAddressId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("shipman.Server.Domain.Entities.Contact", "Receiver")
+                        .WithMany()
+                        .HasForeignKey("ReceiverId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("shipman.Server.Domain.Entities.Contact", "Sender")
+                        .WithMany()
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("DestinationAddress");
+
+                    b.Navigation("Receiver");
+
+                    b.Navigation("Sender");
+                });
+
+            modelBuilder.Entity("shipman.Server.Domain.Entities.ShipmentEvent", b =>
                 {
                     b.HasOne("shipman.Server.Domain.Entities.Shipment", "Shipment")
                         .WithMany("Events")
@@ -166,115 +295,14 @@ namespace shipman.Server.Data.Migrations
                     b.Navigation("Shipment");
                 });
 
-            modelBuilder.Entity("shipman.Server.Domain.Entities.Shipment", b =>
+            modelBuilder.Entity("shipman.Server.Domain.Entities.Address", b =>
                 {
-                    b.OwnsOne("shipman.Server.Domain.Entities.ValueObjects.Coordinates", "DestinationCoordinates", b1 =>
-                        {
-                            b1.Property<Guid>("ShipmentId")
-                                .HasColumnType("TEXT");
+                    b.Navigation("ContactLinks");
+                });
 
-                            b1.Property<double>("Lat")
-                                .HasColumnType("REAL");
-
-                            b1.Property<double>("Lng")
-                                .HasColumnType("REAL");
-
-                            b1.HasKey("ShipmentId");
-
-                            b1.ToTable("Shipments");
-
-                            b1.WithOwner()
-                                .HasForeignKey("ShipmentId");
-                        });
-
-                    b.OwnsOne("shipman.Server.Domain.Entities.ValueObjects.Coordinates", "OriginCoordinates", b1 =>
-                        {
-                            b1.Property<Guid>("ShipmentId")
-                                .HasColumnType("TEXT");
-
-                            b1.Property<double>("Lat")
-                                .HasColumnType("REAL");
-
-                            b1.Property<double>("Lng")
-                                .HasColumnType("REAL");
-
-                            b1.HasKey("ShipmentId");
-
-                            b1.ToTable("Shipments");
-
-                            b1.WithOwner()
-                                .HasForeignKey("ShipmentId");
-                        });
-
-                    b.OwnsOne("Contact", "Receiver", b1 =>
-                        {
-                            b1.Property<Guid>("ShipmentId")
-                                .HasColumnType("TEXT");
-
-                            b1.Property<string>("Address")
-                                .IsRequired()
-                                .HasColumnType("TEXT");
-
-                            b1.Property<string>("Email")
-                                .IsRequired()
-                                .HasColumnType("TEXT");
-
-                            b1.Property<string>("Name")
-                                .IsRequired()
-                                .HasColumnType("TEXT");
-
-                            b1.Property<string>("Phone")
-                                .IsRequired()
-                                .HasColumnType("TEXT");
-
-                            b1.HasKey("ShipmentId");
-
-                            b1.ToTable("Shipments");
-
-                            b1.WithOwner()
-                                .HasForeignKey("ShipmentId");
-                        });
-
-                    b.OwnsOne("Contact", "Sender", b1 =>
-                        {
-                            b1.Property<Guid>("ShipmentId")
-                                .HasColumnType("TEXT");
-
-                            b1.Property<string>("Address")
-                                .IsRequired()
-                                .HasColumnType("TEXT");
-
-                            b1.Property<string>("Email")
-                                .IsRequired()
-                                .HasColumnType("TEXT");
-
-                            b1.Property<string>("Name")
-                                .IsRequired()
-                                .HasColumnType("TEXT");
-
-                            b1.Property<string>("Phone")
-                                .IsRequired()
-                                .HasColumnType("TEXT");
-
-                            b1.HasKey("ShipmentId");
-
-                            b1.ToTable("Shipments");
-
-                            b1.WithOwner()
-                                .HasForeignKey("ShipmentId");
-                        });
-
-                    b.Navigation("DestinationCoordinates")
-                        .IsRequired();
-
-                    b.Navigation("OriginCoordinates")
-                        .IsRequired();
-
-                    b.Navigation("Receiver")
-                        .IsRequired();
-
-                    b.Navigation("Sender")
-                        .IsRequired();
+            modelBuilder.Entity("shipman.Server.Domain.Entities.Contact", b =>
+                {
+                    b.Navigation("DestinationAddresses");
                 });
 
             modelBuilder.Entity("shipman.Server.Domain.Entities.Shipment", b =>

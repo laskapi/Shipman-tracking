@@ -1,13 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authentication;
+﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using shipman.Server.Application.Dtos.Auth;
+using shipman.Server.Data;
+using shipman.Server.Domain.Entities;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using shipman.Server.Domain.Entities;
-using shipman.Server.Data;
-using shipman.Server.Application.Dtos.Auth;
 
 namespace shipman.Server.Api.Controllers;
 
@@ -114,7 +114,6 @@ public class AuthController : ControllerBase
         });
     }
 
-    // Helpers
     private void CreatePasswordHash(string password, out byte[] hash, out byte[] salt)
     {
         using var hmac = new HMACSHA512();

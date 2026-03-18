@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using shipman.Server.Application.Exceptions;
 using shipman.Server.Domain.Enums;
-using shipman.Tests.TestUtils;
+using shipman.Tests.Unit.Domain;
+using shipman.Tests.Unit.Dtos;
 
 namespace shipman.Tests.Unit.Services;
 
@@ -11,20 +13,19 @@ public class ShipmentServiceTests
     {
         await using var db = InMemoryDbContextFactory.Create();
 
-        var shipmentId = Guid.NewGuid();
-        var shipment = ServiceDataFactory.CreateShipment(shipmentId);
-
+        var shipment = DomainFactory.Shipment();
         db.Shipments.Add(shipment);
         await db.SaveChangesAsync();
 
-        var service = ServiceDataFactory.CreateService(db);
-        var dto = DtoFactory.CreateEventDto(ShipmentEventType.PickedUp);
+        var service = ServiceFactory.Create(db);
 
-        var result = await service.AddEventAsync(shipmentId, dto);
+        var dto = DtoFactory.CreateEvent(ShipmentEventType.Prepared);
+
+        var result = await service.AddEventAsync(shipment.Id, dto);
 
         Assert.NotNull(result);
-        Assert.Single(result!.Events);
-        Assert.Equal(ShipmentEventType.PickedUp, result.Events.First().EventType);
+        Assert.Single(result.Events);
+        Assert.Equal(ShipmentEventType.Prepared, result.Events.First().EventType);
     }
 
     [Fact]
@@ -32,71 +33,69 @@ public class ShipmentServiceTests
     {
         await using var db = InMemoryDbContextFactory.Create();
 
-        var shipmentId = Guid.NewGuid();
-        var events = new List<ShipmentEvent>
+        var events = new[]
         {
-            ServiceDataFactory.CreateEvent(ShipmentEventType.PickedUp, shipmentId)
+            DomainFactory.Event(ShipmentEventType.Prepared),
+            DomainFactory.Event(ShipmentEventType.HandedOver),
+            DomainFactory.Event(ShipmentEventType.Delayed)
         };
 
-        var shipment = ServiceDataFactory.CreateShipment(shipmentId, events: events);
-
+        var shipment = DomainFactory.Shipment(events: events);
         db.Shipments.Add(shipment);
         await db.SaveChangesAsync();
 
-        var service = ServiceDataFactory.CreateService(db);
-        var dto = DtoFactory.CreateEventDto(
+        var service = ServiceFactory.Create(db);
+
+        var dto = DtoFactory.CreateEvent(
             ShipmentEventType.Cancelled,
             description: "Cancelled by sender"
         );
 
-        var result = await service.AddEventAsync(shipmentId, dto);
+        var result = await service.AddEventAsync(shipment.Id, dto);
 
         Assert.NotNull(result);
-        Assert.Equal(ShipmentStatus.Cancelled, result!.Status);
+        Assert.Equal(ShipmentStatus.Cancelled, result.Status);
         Assert.Contains(result.Events, e => e.EventType == ShipmentEventType.Cancelled);
     }
 
     [Fact]
-    public async Task AddEventAsync_ReturnsNull_WhenShipmentDoesNotExist()
+    public async Task AddEventAsync_Throws_WhenShipmentDoesNotExist()
     {
         await using var db = InMemoryDbContextFactory.Create();
-        var service = ServiceDataFactory.CreateService(db);
+        var service = ServiceFactory.Create(db);
 
-        var dto = DtoFactory.CreateEventDto(ShipmentEventType.PickedUp);
+        var dto = DtoFactory.CreateEvent(ShipmentEventType.HandedOver);
 
-        var result = await service.AddEventAsync(Guid.NewGuid(), dto);
-
-        Assert.Null(result);
+        await Assert.ThrowsAsync<AppNotFoundException>(() =>
+            service.AddEventAsync(Guid.NewGuid(), dto)
+        );
     }
 
     [Fact]
-    public async Task DeleteShipmentAsync_RemovesShipment_AndReturnsTrue()
+    public async Task DeleteShipmentAsync_RemovesShipment()
     {
         await using var db = InMemoryDbContextFactory.Create();
 
-        var shipmentId = Guid.NewGuid();
-        var shipment = ServiceDataFactory.CreateShipment(shipmentId);
-
+        var shipment = DomainFactory.Shipment();
         db.Shipments.Add(shipment);
         await db.SaveChangesAsync();
 
-        var service = ServiceDataFactory.CreateService(db);
+        var service = ServiceFactory.Create(db);
 
-        var result = await service.DeleteShipmentAsync(shipmentId);
+        await service.DeleteShipmentAsync(shipment.Id);
 
-        Assert.True(result);
-        Assert.False(await db.Shipments.AnyAsync(s => s.Id == shipmentId));
+        Assert.False(await db.Shipments.AnyAsync(s => s.Id == shipment.Id));
     }
 
     [Fact]
-    public async Task DeleteShipmentAsync_ReturnsFalse_WhenShipmentDoesNotExist()
+    public async Task DeleteShipmentAsync_Throws_WhenShipmentDoesNotExist()
     {
         await using var db = InMemoryDbContextFactory.Create();
-        var service = ServiceDataFactory.CreateService(db);
+        var service = ServiceFactory.Create(db);
 
-        var result = await service.DeleteShipmentAsync(Guid.NewGuid());
-
-        Assert.False(result);
+        await Assert.ThrowsAsync<AppNotFoundException>(() =>
+            service.DeleteShipmentAsync(Guid.NewGuid())
+        );
     }
 
     [Fact]
@@ -104,34 +103,34 @@ public class ShipmentServiceTests
     {
         await using var db = InMemoryDbContextFactory.Create();
 
-        var shipmentId = Guid.NewGuid();
-        var events = new List<ShipmentEvent>
+        var events = new[]
         {
-            ServiceDataFactory.CreateEvent(ShipmentEventType.PickedUp, shipmentId)
+            DomainFactory.Event(ShipmentEventType.Prepared)
         };
 
-        var shipment = ServiceDataFactory.CreateShipment(shipmentId, events: events);
-
+        var shipment = DomainFactory.Shipment(events: events);
         db.Shipments.Add(shipment);
         await db.SaveChangesAsync();
 
-        var service = ServiceDataFactory.CreateService(db);
-        var result = await service.GetByIdAsync(shipmentId);
+        var service = ServiceFactory.Create(db);
+        var result = await service.GetByIdAsync(shipment.Id);
 
         Assert.NotNull(result);
-        Assert.Equal(shipmentId, result!.Id);
+        Assert.Equal(shipment.Id, result.Id);
         Assert.Single(result.Events);
-        Assert.Equal(ShipmentEventType.PickedUp, result.Events.First().EventType);
+        Assert.Equal(ShipmentEventType.Prepared, result.Events.First().EventType);
     }
 
     [Fact]
     public async Task CreateShipmentAsync_CreatesShipment_WithCreatedEvent()
     {
         await using var db = InMemoryDbContextFactory.Create();
-        var service = ServiceDataFactory.CreateService(db);
 
-        var dto = DtoFactory.CreateShipment();
+        var (sender, receiver) = await ServiceFactory.SeedContactsAsync(db);
 
+        var service = ServiceFactory.Create(db);
+
+        var dto = DtoFactory.CreateShipment(sender.Id, receiver.Id);
 
         var result = await service.CreateShipmentAsync(dto);
 
