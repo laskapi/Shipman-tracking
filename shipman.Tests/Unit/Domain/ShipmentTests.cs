@@ -4,63 +4,43 @@ namespace shipman.Tests.Unit.Domain;
 
 public class ShipmentTests
 {
-  
     [Fact]
-    public void CannotDeliverBeforePickup()
+    public void CannotDeliverBeforeHandedOver()
     {
-        var shipment = DomainDataFactory.CreateShipment();
+        var shipment = DomainFactory.Shipment();
 
-        var deliveredEvent = new ShipmentEvent
-        {
-            Id = Guid.NewGuid(),
-            EventType = ShipmentEventType.Delivered,
-            Timestamp = DateTime.UtcNow
-        };
+        var deliveredEvent = DomainFactory.Event(ShipmentEventType.Delivered, shipment.Id);
 
         Assert.Throws<InvalidOperationException>(() =>
             shipment.AddEvent(deliveredEvent)
         );
     }
-    [Fact]
-    public void CannotPickupTwice()
-    {
-        var shipment = DomainDataFactory.CreateShipment();
-        
-        shipment.AddEvent(new ShipmentEvent
-        {
-            Id = Guid.NewGuid(),
-            EventType = ShipmentEventType.PickedUp,
-            Timestamp = DateTime.UtcNow
-        });
 
-        var secondPickup = new ShipmentEvent
-        {
-            Id = Guid.NewGuid(),
-            EventType = ShipmentEventType.PickedUp,
-            Timestamp = DateTime.UtcNow
-        };
+    [Fact]
+    public void CannotHandOverTwice()
+    {
+        var shipment = DomainFactory.Shipment();
+
+        shipment.AddEvent(DomainFactory.Event(ShipmentEventType.Prepared, shipment.Id));
+        shipment.AddEvent(DomainFactory.Event(ShipmentEventType.HandedOver, shipment.Id));
+
+        var secondHandOver = DomainFactory.Event(ShipmentEventType.HandedOver, shipment.Id);
 
         Assert.Throws<InvalidOperationException>(() =>
-            shipment.AddEvent(secondPickup)
+            shipment.AddEvent(secondHandOver)
         );
     }
+
     [Fact]
     public void CannotCancelAfterDelivered()
     {
-        var shipment = DomainDataFactory.CreateShipment();
+        var shipment = DomainFactory.Shipment();
 
-        shipment.AddEvent(new ShipmentEvent { Id = Guid.NewGuid(), EventType = ShipmentEventType.PickedUp, Timestamp = DateTime.UtcNow });
-        shipment.AddEvent(new ShipmentEvent { Id = Guid.NewGuid(), EventType = ShipmentEventType.InTransit, Timestamp = DateTime.UtcNow });
-        shipment.AddEvent(new ShipmentEvent { Id = Guid.NewGuid(), EventType = ShipmentEventType.ArrivedAtFacility, Timestamp = DateTime.UtcNow });
-        shipment.AddEvent(new ShipmentEvent { Id = Guid.NewGuid(), EventType = ShipmentEventType.OutForDelivery, Timestamp = DateTime.UtcNow });
-        shipment.AddEvent(new ShipmentEvent { Id = Guid.NewGuid(), EventType = ShipmentEventType.Delivered, Timestamp = DateTime.UtcNow });
+        shipment.AddEvent(DomainFactory.Event(ShipmentEventType.Prepared, shipment.Id));
+        shipment.AddEvent(DomainFactory.Event(ShipmentEventType.HandedOver, shipment.Id));
+        shipment.AddEvent(DomainFactory.Event(ShipmentEventType.Delivered, shipment.Id));
 
-        var cancelEvent = new ShipmentEvent
-        {
-            Id = Guid.NewGuid(),
-            EventType = ShipmentEventType.Cancelled,
-            Timestamp = DateTime.UtcNow
-        };
+        var cancelEvent = DomainFactory.Event(ShipmentEventType.Cancelled, shipment.Id);
 
         Assert.Throws<InvalidOperationException>(() =>
             shipment.AddEvent(cancelEvent)
@@ -70,64 +50,43 @@ public class ShipmentTests
     [Fact]
     public void CannotAddEventsAfterCancellation()
     {
-        var shipment = DomainDataFactory.CreateShipment();
+        var shipment = DomainFactory.Shipment();
 
-        shipment.AddEvent(new ShipmentEvent
-        {
-            Id = Guid.NewGuid(),
-            EventType = ShipmentEventType.Cancelled,
-            Timestamp = DateTime.UtcNow
-        });
-        var inTransitEvent = new ShipmentEvent
-        {
-            Id = Guid.NewGuid(),
-            EventType = ShipmentEventType.InTransit,
-            Timestamp = DateTime.UtcNow
-        };
+        shipment.AddEvent(DomainFactory.Event(ShipmentEventType.Cancelled, shipment.Id));
+
+        var handedOverEvent = DomainFactory.Event(ShipmentEventType.HandedOver, shipment.Id);
+
         Assert.Throws<InvalidOperationException>(() =>
-        shipment.AddEvent(inTransitEvent));
-
+            shipment.AddEvent(handedOverEvent)
+        );
     }
+
     [Fact]
     public void StatusUpdatesCorrectlyBasedOnEventType()
     {
-        var shipment = DomainDataFactory.CreateShipment();
+        var shipment = DomainFactory.Shipment();
 
-        shipment.AddEvent(new ShipmentEvent
-        {
-            Id = Guid.NewGuid(),
-            EventType = ShipmentEventType.PickedUp,
-            Timestamp = DateTime.UtcNow
-        });
+        shipment.AddEvent(DomainFactory.Event(ShipmentEventType.Prepared, shipment.Id));
+        shipment.AddEvent(DomainFactory.Event(ShipmentEventType.HandedOver, shipment.Id));
 
-        Assert.Equal(ShipmentStatus.Shipped, shipment.Status);
+        Assert.Equal(ShipmentStatus.HandedOver, shipment.Status);
     }
+
     [Fact]
     public void ValidEventSequence_CompletesWithoutErrors()
     {
-        var shipment = DomainDataFactory.CreateShipment();
+        var shipment = DomainFactory.Shipment();
 
-        var events = new[]
+        var sequence = new[]
         {
-        ShipmentEventType.PickedUp,
-        ShipmentEventType.InTransit,
-        ShipmentEventType.ArrivedAtFacility,
-        ShipmentEventType.OutForDelivery,
-        ShipmentEventType.Delivered
-    };
+            ShipmentEventType.Prepared,
+            ShipmentEventType.HandedOver,
+            ShipmentEventType.Delivered
+        };
 
-        foreach (var type in events)
-        {
-            shipment.AddEvent(new ShipmentEvent
-            {
-                Id = Guid.NewGuid(),
-                EventType = type,
-                Timestamp = DateTime.UtcNow
-            });
-        }
+        foreach (var type in sequence)
+            shipment.AddEvent(DomainFactory.Event(type, shipment.Id));
 
         Assert.Equal(ShipmentStatus.Delivered, shipment.Status);
     }
-    
-
 }

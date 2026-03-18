@@ -1,6 +1,5 @@
 ﻿using shipman.Server.Data;
 using shipman.Server.Domain.Entities;
-using shipman.Server.Domain.Entities.ValueObjects;
 using shipman.Server.Domain.Enums;
 
 public static class DbSeeder
@@ -10,14 +9,66 @@ public static class DbSeeder
         if (db.Shipments.Any())
             return;
 
+        var addresses = new List<Address>();
+        var contacts = new List<Contact>();
         var shipments = new List<Shipment>();
+
+        // -----------------------------
+        // Helpers
+        // -----------------------------
+
+        Address CreateAddress(
+            string street,
+            string house,
+            string? apt,
+            string city,
+            string postal,
+            string country,
+            double lat,
+            double lng)
+        {
+            var a = new Address
+            {
+                Id = Guid.NewGuid(),
+                Street = street,
+                HouseNumber = house,
+                ApartmentNumber = apt,
+                City = city,
+                PostalCode = postal,
+                Country = country,
+                Latitude = lat,
+                Longitude = lng
+            };
+
+            addresses.Add(a);
+            return a;
+        }
+
+        Contact CreateContact(
+            string name,
+            string email,
+            string phone,
+            Address primary)
+        {
+            var c = new Contact
+            {
+                Id = Guid.NewGuid(),
+                Name = name,
+                Email = email,
+                Phone = phone,
+                PrimaryAddressId = primary.Id,
+                PrimaryAddress = primary
+            };
+
+            contacts.Add(c);
+            return c;
+        }
 
         Shipment CreateShipment(
             string tracking,
             Contact sender,
             Contact receiver,
-            Coordinates originCoords,
-            Coordinates destinationCoords,
+            Address destination,
             decimal weight,
             ServiceType serviceType,
             List<(int hoursAgo, ShipmentEventType type, string location, string desc)> events)
@@ -26,24 +77,27 @@ public static class DbSeeder
             {
                 Id = Guid.NewGuid(),
                 TrackingNumber = tracking,
-
+                SenderId = sender.Id,
                 Sender = sender,
+                ReceiverId = receiver.Id,
                 Receiver = receiver,
-
-                OriginCoordinates = originCoords,
-                DestinationCoordinates = destinationCoords,
-
+                DestinationAddressId = destination.Id,
+                DestinationAddress = destination,
                 Weight = weight,
-                ServiceType = serviceType
+                ServiceType = serviceType,
+                Status = ShipmentStatus.Created,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
             };
 
             s.CalculateEstimatedDelivery();
 
-            foreach (var e in events)
+            foreach (var e in events.OrderByDescending(e => e.hoursAgo))
             {
                 s.AddEvent(new ShipmentEvent
                 {
                     Id = Guid.NewGuid(),
+                    ShipmentId = s.Id,
                     Timestamp = DateTime.UtcNow.AddHours(-e.hoursAgo),
                     EventType = e.type,
                     Location = e.location,
@@ -51,227 +105,153 @@ public static class DbSeeder
                 });
             }
 
+            shipments.Add(s);
             return s;
         }
 
-        shipments.AddRange(new[]
-        {
-            // 1 — Zielona Góra → Opole
-            CreateShipment(
-                "PL000111222",
-                new Contact("Castorama Zielona Góra", "store1@example.com", "+48 600 000 001", "Zielona Góra, Poland"),
-                new Contact("Adrian Malinowski", "adrian@example.com", "+48 600 111 222", "Opole, Poland"),
-                new Coordinates(51.9356, 15.5062),
-                new Coordinates(50.6751, 17.9213),
-                9.8m,
-                ServiceType.Standard,
-                new()
-                {
-                    (5, ShipmentEventType.Created, "Zielona Góra, Poland", "Shipment created"),
-                    (3, ShipmentEventType.PickedUp, "Zielona Góra, Poland", "Shipment picked up"),
-                    (1, ShipmentEventType.InTransit, "Wrocław Sorting Center", "Arrived at sorting facility")
-                }),
+        // -----------------------------
+        // Create Contacts + Addresses
+        // -----------------------------
 
-            // 2 — Warszawa → Poznań
-            CreateShipment(
-                "PL000333444",
-                new Contact("MediaMarkt Warszawa", "store2@example.com", "+48 600 000 002", "Warszawa, Poland"),
-                new Contact("Kamil Nowak", "kamil@example.com", "+48 600 333 444", "Poznań, Poland"),
-                new Coordinates(52.2297, 21.0122),
-                new Coordinates(52.4064, 16.9252),
-                2.3m,
-                ServiceType.Express,
-                new()
-                {
-                    (2, ShipmentEventType.Created, "Warszawa, Poland", "Shipment created"),
-                    (1, ShipmentEventType.PickedUp, "Warszawa, Poland", "Shipment picked up")
-                }),
+        var addrNorthPoint = CreateAddress("Maple Street", "12A", null, "Riverton", "10-101", "Nordovia", 51.2345, 19.8765);
+        var addrAlex = CreateAddress("Oakridge Avenue", "55", "4", "Clearwater", "20-202", "Nordovia", 52.1122, 18.5544);
 
-            // 3 — Gdańsk → Kraków
-            CreateShipment(
-                "PL000555666",
-                new Contact("IKEA Gdańsk", "store3@example.com", "+48 600 000 003", "Gdańsk, Poland"),
-                new Contact("Magda Kowalska", "magda@example.com", "+48 600 555 666", "Kraków, Poland"),
-                new Coordinates(54.3520, 18.6466),
-                new Coordinates(50.0647, 19.9450),
-                45.0m,
-                ServiceType.Freight,
-                new()
-                {
-                    (10, ShipmentEventType.Created, "Gdańsk, Poland", "Shipment created"),
-                    (8, ShipmentEventType.PickedUp, "Gdańsk, Poland", "Shipment picked up"),
-                    (4, ShipmentEventType.InTransit, "Łódź Logistics Hub", "Arrived at freight hub")
-                }),
+        var northPoint = CreateContact("NorthPoint Supplies", "contact@northpoint.com", "+48 500 100 200", addrNorthPoint);
+        var alexCarter = CreateContact("Alex Carter", "alex.carter@example.com", "+48 500 200 300", addrAlex);
 
-            // 4 — Wrocław → Szczecin
-            CreateShipment(
-                "PL000777888",
-                new Contact("DPD Wrocław", "dpd@example.com", "+48 600 777 888", "Wrocław, Poland"),
-                new Contact("Marek Zieliński", "marek@example.com", "+48 600 888 777", "Szczecin, Poland"),
-                new Coordinates(51.1079, 17.0385),
-                new Coordinates(53.4285, 14.5528),
-                12.4m,
-                ServiceType.Standard,
-                new()
-                {
-                    (6, ShipmentEventType.Created, "Wrocław, Poland", "Shipment created")
-                }),
+        var addrBlueBox = CreateAddress("ul. Brzozowa", "8", "2B", "Brzozówka", "33-120", "Poland", 50.9876, 20.1234);
+        var addrMaya = CreateAddress("Riverbend Road", "14", null, "Stonehaven", "40-404", "Nordovia", 53.2211, 17.9988);
 
-            // 5 — Katowice → Rzeszów
-            CreateShipment(
-                "PL000999000",
-                new Contact("RTV Katowice", "rtv@example.com", "+48 600 999 000", "Katowice, Poland"),
-                new Contact("Julia Pawlak", "julia@example.com", "+48 600 000 999", "Rzeszów, Poland"),
-                new Coordinates(50.2649, 19.0238),
-                new Coordinates(50.0413, 21.9990),
-                4.1m,
-                ServiceType.Standard,
-                new()
-                {
-                    (3, ShipmentEventType.Created, "Katowice, Poland", "Shipment created")
-                }),
+        var blueBox = CreateContact("BlueBox Electronics", "store@bluebox.com", "+48 500 300 400", addrBlueBox);
+        var mayaJensen = CreateContact("Maya Jensen", "maya.jensen@example.com", "+48 500 400 500", addrMaya);
 
-            // 6 — Łódź → Lublin
-            CreateShipment(
-                "PL001111222",
-                new Contact("Leroy Merlin Łódź", "lm@example.com", "+48 601 111 222", "Łódź, Poland"),
-                new Contact("Piotr Lewandowski", "piotr@example.com", "+48 601 222 111", "Lublin, Poland"),
-                new Coordinates(51.7592, 19.4550),
-                new Coordinates(51.2465, 22.5684),
-                7.2m,
-                ServiceType.Standard,
-                new()
-                {
-                    (4, ShipmentEventType.Created, "Łódź, Poland", "Shipment created")
-                }),
+        var addrUrbanHome = CreateAddress("ul. Słoneczna", "14", null, "Jasnogród", "55-550", "Poland", 51.5566, 19.3344);
+        var addrLiam = CreateAddress("Brookside Lane", "7", "1A", "Brookfield", "60-606", "Nordovia", 52.7788, 18.1122);
 
-            // 7 — Białystok → Gdynia
-            CreateShipment(
-                "PL001333444",
-                new Contact("Auchan Białystok", "auchan@example.com", "+48 601 333 444", "Białystok, Poland"),
-                new Contact("Ola Kwiatkowska", "ola@example.com", "+48 601 444 333", "Gdynia, Poland"),
-                new Coordinates(53.1325, 23.1688),
-                new Coordinates(54.5189, 18.5305),
-                3.5m,
-                ServiceType.Express,
-                new()
-                {
-                    (1, ShipmentEventType.Created, "Białystok, Poland", "Shipment created")
-                }),
+        var urbanHome = CreateContact("UrbanHome Depot", "info@urbanhome.com", "+48 500 500 600", addrUrbanHome);
+        var liamNovak = CreateContact("Liam Novak", "liam.novak@example.com", "+48 500 600 700", addrLiam);
 
-            // 8 — Toruń → Kielce
-            CreateShipment(
-                "PL001555666",
-                new Contact("Toruń Logistics", "torun@example.com", "+48 601 555 666", "Toruń, Poland"),
-                new Contact("Karolina Wójcik", "karolina@example.com", "+48 601 666 555", "Kielce, Poland"),
-                new Coordinates(53.0138, 18.5984),
-                new Coordinates(50.8661, 20.6286),
-                6.0m,
-                ServiceType.Standard,
-                new()
-                {
-                    (2, ShipmentEventType.Created, "Toruń, Poland", "Shipment created")
-                }),
+        var addrQuickShip = CreateAddress("Logistics Way", "3", null, "Westvale", "70-707", "Nordovia", 50.8899, 19.4455);
+        var addrSofia = CreateAddress("ul. Kwiatowa", "22", "5", "Nowa Dolina", "80-808", "Poland", 51.6677, 20.5566);
 
-            // 9 — Olsztyn → Bielsko-Biała
-            CreateShipment(
-                "PL001777888",
-                new Contact("Olsztyn Store", "olsztyn@example.com", "+48 601 777 888", "Olsztyn, Poland"),
-                new Contact("Tomasz Król", "tomasz@example.com", "+48 601 888 777", "Bielsko-Biała, Poland"),
-                new Coordinates(53.7784, 20.4801),
-                new Coordinates(49.8224, 19.0444),
-                8.9m,
-                ServiceType.Standard,
-                new()
-                {
-                    (5, ShipmentEventType.Created, "Olsztyn, Poland", "Shipment created")
-                }),
+        var quickShip = CreateContact("QuickShip Logistics", "support@quickship.com", "+48 500 700 800", addrQuickShip);
+        var sofiaReyes = CreateContact("Sofia Reyes", "sofia.reyes@example.com", "+48 500 800 900", addrSofia);
 
-            // 10 — Radom → Gorzów Wielkopolski
-            CreateShipment(
-                "PL001999000",
-                new Contact("Radom Depot", "radom@example.com", "+48 601 999 000", "Radom, Poland"),
-                new Contact("Ewa Szymańska", "ewa@example.com", "+48 601 000 999", "Gorzów Wielkopolski, Poland"),
-                new Coordinates(51.4027, 21.1471),
-                new Coordinates(52.7368, 15.2288),
-                5.7m,
-                ServiceType.Standard,
-                new()
-                {
-                    (4, ShipmentEventType.Created, "Radom, Poland", "Shipment created")
-                }),
+        // -----------------------------
+        // Create Shipments
+        // -----------------------------
 
-            // 11 — Sopot → Tarnów
-            CreateShipment(
-                "PL002111222",
-                new Contact("Sopot Boutique", "sopot@example.com", "+48 602 111 222", "Sopot, Poland"),
-                new Contact("Michał Baran", "michal@example.com", "+48 602 222 111", "Tarnów, Poland"),
-                new Coordinates(54.4416, 18.5601),
-                new Coordinates(50.0121, 20.9858),
-                2.9m,
-                ServiceType.Express,
-                new()
-                {
-                    (1, ShipmentEventType.Created, "Sopot, Poland", "Shipment created")
-                }),
+        CreateShipment(
+            "FX100001",
+            northPoint,
+            alexCarter,
+            addrAlex,
+            4.5m,
+            ServiceType.Standard,
+            new()
+            {
+                (10, ShipmentEventType.Prepared, "Riverton", "Package prepared for dispatch"),
+                (6, ShipmentEventType.HandedOver, "Riverton", "Shipment handed over to courier"),
+                (1, ShipmentEventType.Delivered, "Clearwater", "Delivered to recipient")
+            });
 
-            // 12 — Koszalin → Zamość
-            CreateShipment(
-                "PL002333444",
-                new Contact("Koszalin Market", "koszalin@example.com", "+48 602 333 444", "Koszalin, Poland"),
-                new Contact("Natalia Lis", "natalia@example.com", "+48 602 444 333", "Zamość, Poland"),
-                new Coordinates(54.1943, 16.1722),
-                new Coordinates(50.7231, 23.2510),
-                11.0m,
-                ServiceType.Freight,
-                new()
-                {
-                    (8, ShipmentEventType.Created, "Koszalin, Poland", "Shipment created")
-                }),
+        CreateShipment(
+            "FX100002",
+            blueBox,
+            mayaJensen,
+            addrMaya,
+            1.2m,
+            ServiceType.Express,
+            new()
+            {
+                (6, ShipmentEventType.Prepared, "Brzozówka", "Packed and ready"),
+                (3, ShipmentEventType.HandedOver, "Brzozówka", "Courier picked up the shipment")
+            });
 
-            // 13 — Płock → Legnica
-            CreateShipment(
-                "PL002555666",
-                new Contact("Płock Warehouse", "plock@example.com", "+48 602 555 666", "Płock, Poland"),
-                new Contact("Sebastian Gajda", "sebastian@example.com", "+48 602 666 555", "Legnica, Poland"),
-                new Coordinates(52.5463, 19.7065),
-                new Coordinates(51.2070, 16.1550),
-                7.4m,
-                ServiceType.Standard,
-                new()
-                {
-                    (3, ShipmentEventType.Created, "Płock, Poland", "Shipment created")
-                }),
+        CreateShipment(
+            "FX100003",
+            urbanHome,
+            liamNovak,
+            addrLiam,
+            12.0m,
+            ServiceType.Freight,
+            new()
+            {
+                (20, ShipmentEventType.Prepared, "Jasnogród", "Loaded onto freight truck"),
+                (10, ShipmentEventType.Delayed, "Stonehaven", "Unexpected delay at checkpoint")
+            });
 
-            // 14 — Elbląg → Nowy Sącz
-            CreateShipment(
-                "PL002777888",
-                new Contact("Elbląg Center", "elblag@example.com", "+48 602 777 888", "Elbląg, Poland"),
-                new Contact("Dominika Urban", "dominika@example.com", "+48 602 888 777", "Nowy Sącz, Poland"),
-                new Coordinates(54.1522, 19.4088),
-                new Coordinates(49.6210, 20.6970),
-                3.2m,
-                ServiceType.Standard,
-                new()
-                {
-                    (2, ShipmentEventType.Created, "Elbląg, Poland", "Shipment created")
-                }),
+        CreateShipment(
+            "FX100004",
+            quickShip,
+            sofiaReyes,
+            addrSofia,
+            3.3m,
+            ServiceType.Standard,
+            new()
+            {
+                (4, ShipmentEventType.Prepared, "Westvale", "Package prepared"),
+                (2, ShipmentEventType.HandedOver, "Westvale", "Shipment handed over to courier"),
+                (1, ShipmentEventType.Delivered, "Nowa Dolina", "Delivered successfully")
+            });
 
-            // 15 — Kalisz → Suwałki
-            CreateShipment(
-                "PL002999000",
-                new Contact("Kalisz Depot", "kalisz@example.com", "+48 602 999 000", "Kalisz, Poland"),
-                new Contact("Patryk Mazur", "patryk@example.com", "+48 602 000 999", "Suwałki, Poland"),
-                new Coordinates(51.7611, 18.0910),
-                new Coordinates(54.1118, 22.9300),
-                10.5m,
-                ServiceType.Standard,
-                new()
-                {
-                    (6, ShipmentEventType.Created, "Kalisz, Poland", "Shipment created")
-                })
-        });
+        CreateShipment(
+            "FX100005",
+            northPoint,
+            mayaJensen,
+            addrMaya,
+            2.0m,
+            ServiceType.Standard,
+            new()
+            {
+                (5, ShipmentEventType.Prepared, "Riverton", "Prepared for dispatch"),
+                (3, ShipmentEventType.Cancelled, "Riverton", "Shipment cancelled by merchant")
+            });
 
+        CreateShipment(
+            "FX100006",
+            blueBox,
+            liamNovak,
+            addrLiam,
+            7.8m,
+            ServiceType.Express,
+            new()
+            {
+                (7, ShipmentEventType.Prepared, "Brzozówka", "Packed and ready"),
+                (4, ShipmentEventType.HandedOver, "Brzozówka", "Courier picked up the shipment")
+            });
+
+        CreateShipment(
+            "FX100007",
+            urbanHome,
+            sofiaReyes,
+            addrSofia,
+            5.4m,
+            ServiceType.Standard,
+            new()
+            {
+                (8, ShipmentEventType.Prepared, "Jasnogród", "Prepared for dispatch"),
+                (3, ShipmentEventType.Delayed, "Nowa Dolina", "Weather delay reported")
+            });
+
+        CreateShipment(
+            "FX100008",
+            quickShip,
+            alexCarter,
+            addrAlex,
+            9.1m,
+            ServiceType.Freight,
+            new()
+            {
+                (12, ShipmentEventType.Prepared, "Westvale", "Loaded onto freight truck")
+            });
+
+        // -----------------------------
+        // Save to DB
+        // -----------------------------
+
+        db.Addresses.AddRange(addresses);
+        db.Contacts.AddRange(contacts);
         db.Shipments.AddRange(shipments);
         db.SaveChanges();
     }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using shipman.Server.Application.Exceptions;
+using shipman.Server.Application.Interfaces;
 using shipman.Server.Data;
 using shipman.Server.Domain.Entities;
 using System.Globalization;
@@ -8,7 +9,7 @@ using System.Text.RegularExpressions;
 
 namespace shipman.Server.Application.Services.Geocoding;
 
-public class GeocodingService
+public class GeocodingService : IGeocodingService
 {
     private readonly HttpClient _http;
     private readonly IAppDbContext _db;
@@ -40,7 +41,13 @@ public class GeocodingService
         return new string(chars.ToArray()).Normalize(NormalizationForm.FormC);
     }
 
-    public async Task<GeocodeResult> GeocodeAsync(string address)
+    public Task<GeocodeResult> GeocodeAsync(Address address)
+    {
+        var full = $"{address.Street}, {address.City}, {address.PostalCode}, {address.Country}";
+        return GeocodeAsync(full);
+    }
+
+    private async Task<GeocodeResult> GeocodeAsync(string address)
     {
         if (string.IsNullOrWhiteSpace(address))
             throw new AppValidationException(new Dictionary<string, string[]>

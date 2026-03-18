@@ -1,9 +1,9 @@
-﻿using shipman.Server.Domain.Enums;
+﻿namespace shipman.Server.Application.Dtos.Events;
 
 public class ShipmentEventDto
 {
     public DateTime Timestamp { get; set; }
-    public ShipmentEventType EventType { get; set; }
-    public string Location { get; set; } = default!;
-    public string Description { get; set; } = default!;
+    public string EventType { get; set; } = default!;
+    public string? Location { get; set; }
+    public string? Description { get; set; }
 }

@@ -2,8 +2,10 @@
 
 public record ContactDto
 {
+    public ContactDto() { }
+
     public string Name { get; init; } = default!;
     public string Email { get; init; } = default!;
     public string Phone { get; init; } = default!;
-    public string Address { get; set; } = default!;
+    public AddressDto Address { get; init; } = default!;
 }

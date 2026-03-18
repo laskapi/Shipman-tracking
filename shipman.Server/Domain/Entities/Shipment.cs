@@ -1,23 +1,27 @@
-﻿using shipman.Server.Domain.Entities.ValueObjects;
-using shipman.Server.Domain.Enums;
+﻿using shipman.Server.Domain.Enums;
 using shipman.Server.Domain.Extensions;
+using shipman.Server.Domain.Rules;
 
 namespace shipman.Server.Domain.Entities;
 
 public class Shipment
 {
     public Guid Id { get; set; }
-    public string TrackingNumber { get; set; } = default!;
 
-    public Contact Sender { get; set; } = default!;
-    public Contact Receiver { get; set; } = default!;
+    public required string TrackingNumber { get; set; } = default!;
 
-    public Coordinates OriginCoordinates { get; set; } = default!;
-    public Coordinates DestinationCoordinates { get; set; } = default!;
+    public Guid SenderId { get; set; }
+    public required Contact Sender { get; set; } = default!;
+
+    public Guid ReceiverId { get; set; }
+    public required Contact Receiver { get; set; } = default!;
+
+    public Guid DestinationAddressId { get; set; }
+    public required Address DestinationAddress { get; set; } = default!;
 
     public decimal Weight { get; set; }
     public ServiceType ServiceType { get; set; } = ServiceType.Standard;
-    public ShipmentStatus Status { get; set; } = ShipmentStatus.Processing;
+    public ShipmentStatus Status { get; set; } = ShipmentStatus.Created;
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
@@ -31,71 +35,34 @@ public class Shipment
         {
             ServiceType.Express => DateTime.UtcNow.AddDays(1),
             ServiceType.Freight => DateTime.UtcNow.AddDays(5),
-            _ => DateTime.UtcNow.AddDays(3) // Standard
+            _ => DateTime.UtcNow.AddDays(3)
         };
     }
 
     public void AddEvent(ShipmentEvent evt)
     {
-        // Delivered shipments are final.
-        if (Status == ShipmentStatus.Delivered)
-            throw new InvalidOperationException("Cannot add events to a delivered shipment.");
-
-        // Cancelled shipments cannot transition further.
-        if (Status == ShipmentStatus.Cancelled)
-            throw new InvalidOperationException("Cannot add events to a cancelled shipment.");
-
-        switch (evt.EventType)
-        {
-            case ShipmentEventType.PickedUp:
-                // Pickup can only occur once.
-                if (Events.Any(e => e.EventType == ShipmentEventType.PickedUp))
-                    throw new InvalidOperationException("Shipment has already been picked up.");
-                break;
-
-            case ShipmentEventType.InTransit:
-                // Shipment must be picked up before it can be in transit.
-                if (!Events.Any(e => e.EventType == ShipmentEventType.PickedUp))
-                    throw new InvalidOperationException("Shipment must be picked up before going in transit.");
-                break;
-
-            case ShipmentEventType.ArrivedAtFacility:
-            case ShipmentEventType.DepartedFacility:
-                // Facility events require the shipment to be in transit.
-                if (!Events.Any(e => e.EventType == ShipmentEventType.InTransit))
-                    throw new InvalidOperationException("Shipment must be in transit before facility events.");
-                break;
-
-            case ShipmentEventType.OutForDelivery:
-                // Out for delivery requires arrival at facility.
-                if (!Events.Any(e => e.EventType == ShipmentEventType.ArrivedAtFacility))
-                    throw new InvalidOperationException("Shipment must arrive at a facility before going out for delivery.");
-                break;
-
-            case ShipmentEventType.Delivered:
-                // Delivery requires out-for-delivery.
-                if (!Events.Any(e => e.EventType == ShipmentEventType.OutForDelivery))
-                    throw new InvalidOperationException("Shipment must be out for delivery before it can be delivered.");
-
-                // Delivery can only occur once.
-                if (Events.Any(e => e.EventType == ShipmentEventType.Delivered))
-                    throw new InvalidOperationException("Shipment has already been delivered.");
-                break;
-
-            case ShipmentEventType.Cancelled:
-                // Cannot cancel after delivery.
-                if (Events.Any(e => e.EventType == ShipmentEventType.Delivered))
-                    throw new InvalidOperationException("Cannot cancel a delivered shipment.");
-
-                // Cannot cancel twice.
-                if (Events.Any(e => e.EventType == ShipmentEventType.Cancelled))
-                    throw new InvalidOperationException("Shipment has already been cancelled.");
-                break;
-        }
+        EnsureShipmentIsModifiable();
+        ValidateEventSequence(evt);
 
         Events.Add(evt);
         Status = evt.EventType.ToStatus();
         UpdatedAt = evt.Timestamp;
     }
-}
 
+    private void EnsureShipmentIsModifiable()
+    {
+        if (Status == ShipmentStatus.Delivered)
+            throw new InvalidOperationException("Delivered shipments cannot be modified.");
+
+        if (Status == ShipmentStatus.Cancelled)
+            throw new InvalidOperationException("Cancelled shipments cannot be modified.");
+    }
+
+    private void ValidateEventSequence(ShipmentEvent evt)
+    {
+        var last = Events.LastOrDefault()?.EventType ?? ShipmentEventType.Created;
+
+        if (!ShipmentEventFlow.AllowedTransitions[last].Contains(evt.EventType))
+            throw new InvalidOperationException("Invalid event transition.");
+    }
+}

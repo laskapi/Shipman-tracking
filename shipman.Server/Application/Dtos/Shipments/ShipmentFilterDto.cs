@@ -1,7 +1,7 @@
-﻿using shipman.Server.Domain.Enums;
+﻿namespace shipman.Server.Application.Dtos.Shipments;
 
 public class ShipmentFilterDto
 {
-    public string? TrackingNumber { get; set; }
-    public ShipmentStatus? Status { get; set; }
+    public string? Search { get; set; }
+    public string? Status { get; set; }
 }

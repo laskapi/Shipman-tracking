@@ -2,10 +2,10 @@
 
 public enum ShipmentStatus
 {
-    Cancelled,
-    Processing,
-    Shipped,
-    InTransit,
+    Created,
+    Prepared,
+    HandedOver,
+    Delivered,
     Delayed,
-    Delivered
+    Cancelled
 }
