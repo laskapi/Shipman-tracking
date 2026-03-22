@@ -1,10 +1,4 @@
-import
-    {
-        Box,
-        Grid,
-        Stack,
-    } from "@mui/material";
-
+import { Stack } from "@mui/material";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
@@ -14,10 +8,9 @@ import
         type EditShipmentDto
     } from "./editShipmentSchema";
 
-import { PersonFields } from "../components/forms/PersonFields";
+import ContactAutocomplete from "../components/ContactAutocomplete";
+import AddressAutocomplete from "../components/AddressAutocomplete";
 import { ServiceTypeField } from "../components/forms/ServiceTypeField";
-
-import { FormCard } from "../components/forms/FormCard";
 import { FormAction } from "../components/forms/FormAction";
 
 interface Props
@@ -25,6 +18,7 @@ interface Props
     initialValues: EditShipmentDto;
     onSubmit: (values: EditShipmentDto) => Promise<void>;
     isLoading: boolean;
+    shipment: any;
 }
 
 export default function EditShipmentForm({
@@ -36,7 +30,9 @@ export default function EditShipmentForm({
     const {
         register,
         handleSubmit,
-        formState: { errors, isValid },
+        control,
+        setValue,
+        formState: { errors, isValid }
     } = useForm<EditShipmentDto>({
         resolver: zodResolver(editShipmentSchema),
         mode: "onChange",
@@ -45,39 +41,31 @@ export default function EditShipmentForm({
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
-            <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
-                <Grid container spacing={2}>
+            <Stack spacing={3}>
+                <ContactAutocomplete
+                    name="receiverId"
+                    label="Receiver"
+                    control={control}
+                    setValue={setValue}
+                    error={errors.receiverId?.message}
+                />
 
-                    {/* Receiver */}
-                    <Grid size={{ xs: 12, md: 6 }}>
-                        <FormCard title="Receiver">
-                            <PersonFields
-                                register={register}
-                                errors={errors}
-                                prefix="receiver"
-                            />
-                        </FormCard>
-                    </Grid>
+                <AddressAutocomplete
+                    name="destinationAddressId"
+                    label="Destination Address"
+                    control={control}
+                    setValue={setValue}
+                    error={errors.destinationAddressId?.message}
+                />
 
-                    {/* Shipment Details */}
-                    <Grid size={{ xs: 12, md: 6 }}>
-                        <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
-                            <FormCard title="Shipment Details">
-                                <Stack spacing={1}>
-                                    <ServiceTypeField register={register} errors={errors} />
-                                </Stack>
-                            </FormCard>
+                <ServiceTypeField register={register} errors={errors} />
 
-                            <FormAction
-                                isValid={isValid}
-                                isLoading={isLoading}
-                                label="Update Shipment"
-                            />
-                        </Box>
-                    </Grid>
-
-                </Grid>
-            </Box>
+                <FormAction
+                    isValid={isValid}
+                    isLoading={isLoading}
+                    label="Update Shipment"
+                />
+            </Stack>
         </form>
     );
 }

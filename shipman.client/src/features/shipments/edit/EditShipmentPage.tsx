@@ -13,7 +13,7 @@ import
 
 import EditShipmentForm from "./EditShipmentForm";
 import type { EditShipmentDto } from "../edit/editShipmentSchema";
-import type { AppDispatch } from "../../../app/store";
+import type { AppDispatch } from "@/app/store";
 
 export default function EditShipmentPage()
 {
@@ -29,7 +29,6 @@ export default function EditShipmentPage()
         dispatch(
             setHeader({
                 title: "Edit Shipment",
-                subtitle: "",
                 breadcrumb: [
                     { label: "Shipments", to: "/shipments" },
                     { label: "Shipment Details", to: `/shipments/${id}` },
@@ -43,7 +42,8 @@ export default function EditShipmentPage()
     if (isLoading || !shipment) return null;
 
     const initialValues: EditShipmentDto = {
-        receiver: shipment.receiver,
+        receiverId: shipment.receiverId,
+        destinationAddressId: shipment.destinationAddressId,
         serviceType: shipment.serviceType
     };
 
@@ -54,8 +54,6 @@ export default function EditShipmentPage()
             data: values
         }).unwrap();
 
-        navigate(`/shipments/${updated.id}`);
-
         dispatch(
             shipmentsApi.util.updateQueryData(
                 "getShipmentById",
@@ -63,24 +61,24 @@ export default function EditShipmentPage()
                 draft => Object.assign(draft, updated)
             )
         );
+
+        navigate(`/shipments/${updated.id}`);
     };
 
     return (
-        <Box>
-            <Container maxWidth="lg">
-                <Box display="flex" justifyContent="center" mt={4}>
-                    <Card sx={{ width: "100%", p: 2 }}>
-                        <CardContent>
-                            <EditShipmentForm
-                                shipment={shipment}
-                                initialValues={initialValues}
-                                onSubmit={handleUpdate}
-                                isLoading={isUpdating}
-                            />
-                        </CardContent>
-                    </Card>
-                </Box>
-            </Container>
-        </Box>
+        <Container maxWidth="sm">
+            <Box mt={4}>
+                <Card>
+                    <CardContent>
+                        <EditShipmentForm
+                            shipment={shipment}
+                            initialValues={initialValues}
+                            onSubmit={handleUpdate}
+                            isLoading={isUpdating}
+                        />
+                    </CardContent>
+                </Card>
+            </Box>
+        </Container>
     );
 }

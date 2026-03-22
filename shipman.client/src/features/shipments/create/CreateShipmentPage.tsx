@@ -8,7 +8,7 @@ import { shipmentsApi, useCreateShipmentMutation } from "../shipmentsApi";
 
 import CreateShipmentForm from "./CreateShipmentForm";
 import type { CreateShipmentDto } from "../create/createShipmentSchema";
-import type { AppDispatch } from "../../../app/store";
+import type { AppDispatch } from "@/app/store";
 
 export default function CreateShipmentPage()
 {
@@ -22,7 +22,6 @@ export default function CreateShipmentPage()
         dispatch(
             setHeader({
                 title: "Create Shipment",
-                subtitle: "",
                 breadcrumb: [
                     { label: "Shipments", to: "/shipments" },
                     { label: "Create Shipment" }
@@ -48,35 +47,24 @@ export default function CreateShipmentPage()
     };
 
     return (
-        <Box>
-            <Container maxWidth="md">
-                <Box display="flex" justifyContent="center" mt={4}>
-                    <Card sx={{ width: "100%", p: 2 }}>
-                        <CardContent>
-                            <CreateShipmentForm
-                                onSubmit={handleCreate}
-                                isLoading={isLoading}
-                                initialValues={{
-                                    sender: {
-                                        name: "",
-                                        email: "",
-                                        phone: "",
-                                        address: ""
-                                    },
-                                    receiver: {
-                                        name: "",
-                                        email: "",
-                                        phone: "",
-                                        address: ""
-                                    },
-                                    weight: 0,
-                                    serviceType: "Standard"
-                                }}
-                            />
-                        </CardContent>
-                    </Card>
-                </Box>
-            </Container>
-        </Box>
+        <Container maxWidth="sm">
+            <Box mt={4}>
+                <Card>
+                    <CardContent>
+                        <CreateShipmentForm
+                            onSubmit={handleCreate}
+                            isLoading={isLoading}
+                            initialValues={{
+                                senderId: "",
+                                receiverId: "",
+                                destinationAddressId: null,
+                                weight: 0,
+                                serviceType: "Standard"
+                            }}
+                        />
+                    </CardContent>
+                </Card>
+            </Box>
+        </Container>
     );
 }

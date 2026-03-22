@@ -1,11 +1,9 @@
 import { z } from "zod";
+
+// Schema for editing an existing shipment
 export const editShipmentSchema = z.object({
-    receiver: z.object({
-        name: z.string().min(1, "Name is required"),
-        email: z.string().email("Invalid email"),
-        phone: z.string().min(3, "Phone is too short"),
-        address: z.string().min(3, "Address is too short")
-    }),
+    receiverId: z.string().min(1, "Receiver is required"),
+    destinationAddressId: z.string().nullable(),
     serviceType: z.enum(["Standard", "Express", "Freight"])
 });
 
