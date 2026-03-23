@@ -53,10 +53,18 @@ public class ContactsController : ControllerBase
         return _mapper.Map<ContactDetailsDto>(contact);
     }
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(Guid id)
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> DeleteContact(Guid id)
     {
-        await _service.DeleteAsync(id);
+        await _service.DeleteContactAsync(id);
         return NoContent();
     }
+
+    [HttpDelete("{contactId:guid}/addresses/{addressId:guid}")]
+    public async Task<IActionResult> DetachAddress(Guid contactId, Guid addressId)
+    {
+        await _service.DetachAddressAsync(contactId, addressId);
+        return NoContent();
+    }
+
 }

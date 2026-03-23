@@ -3,6 +3,7 @@ using shipman.Server.Application.Dtos.Contacts;
 using shipman.Server.Application.Dtos.Shipments;
 using shipman.Server.Application.Exceptions;
 using shipman.Server.Application.Services.Addresses;
+using shipman.Server.Application.Services.Shipments;
 using shipman.Server.Data;
 using shipman.Server.Domain.Entities;
 
@@ -12,11 +13,14 @@ public class ContactService
 {
     private readonly IAppDbContext _db;
     private readonly AddressService _addressService;
+    private readonly ShipmentQueries _shipmentQueries;
 
-    public ContactService(IAppDbContext db, AddressService addressService)
+
+    public ContactService(IAppDbContext db, AddressService addressService, ShipmentQueries shipmentQueries)
     {
         _db = db;
         _addressService = addressService;
+        _shipmentQueries = shipmentQueries;
     }
 
     public async Task<Contact> CreateAsync(CreateContactDto dto)
@@ -103,4 +107,52 @@ public class ContactService
         _db.Contacts.Remove(contact);
         await _db.SaveChangesAsync();
     }
+
+    public async Task DeleteContactAsync(Guid contactId)
+    {
+        var contact = await _db.Contacts
+            .Include(c => c.DestinationAddresses)
+            .FirstOrDefaultAsync(c => c.Id == contactId);
+
+        if (contact == null)
+            throw new AppNotFoundException("Contact not found");
+
+        if (await _shipmentQueries.IsContactUsedInShipmentsAsync(contactId))
+            throw new AppInvalidOperationException(
+                "Cannot delete this contact because it is used in shipments");
+
+        _db.ContactDestinationAddresses.RemoveRange(contact.DestinationAddresses);
+        _db.Contacts.Remove(contact);
+
+        await _db.SaveChangesAsync();
+    }
+
+
+    public async Task DetachAddressAsync(Guid contactId, Guid addressId)
+    {
+        var contact = await _db.Contacts
+            .Include(c => c.DestinationAddresses)
+            .FirstOrDefaultAsync(c => c.Id == contactId);
+
+        if (contact == null)
+            throw new AppNotFoundException("Contact not found");
+
+        var link = contact.DestinationAddresses
+            .FirstOrDefault(da => da.AddressId == addressId);
+
+        if (link == null)
+            throw new AppNotFoundException("This address is not linked to the contact");
+
+        var isUsed = await _shipmentQueries
+            .IsContactAddressPairUsedAsync(contactId, addressId);
+
+        if (isUsed)
+            throw new AppInvalidOperationException(
+                "Cannot detach this address because it is used in shipments with this contact");
+
+        _db.ContactDestinationAddresses.Remove(link);
+        await _db.SaveChangesAsync();
+    }
+
+
 }
