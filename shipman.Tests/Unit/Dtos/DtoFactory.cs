@@ -1,4 +1,4 @@
-﻿using shipman.Server.Application.Dtos.Shipments;
+using shipman.Server.Application.Dtos.Shipments;
 using shipman.Server.Domain.Enums;
 
 namespace shipman.Tests.Unit.Dtos;
@@ -8,24 +8,14 @@ public static class DtoFactory
     public static ShipmentCreateDto CreateShipment(
         Guid? senderId = null,
         Guid? receiverId = null,
-        AddressDto? destination = null,
+        Guid? destinationAddressId = null,
         decimal weight = 2.5m,
         ServiceType serviceType = ServiceType.Standard)
     {
         return new ShipmentCreateDto(
             SenderId: senderId ?? Guid.NewGuid(),
             ReceiverId: receiverId ?? Guid.NewGuid(),
-            DestinationAddressId: null,
-            DestinationAddress: destination ?? new AddressDto(
-                Street: "Test Street",
-                HouseNumber: "10A",
-                ApartmentNumber: "5",
-                City: "Testville",
-                PostalCode: "00-000",
-                Country: "Testland",
-                Latitude: 50.0000,
-                Longitude: 20.0000
-            ),
+            DestinationAddressId: destinationAddressId,
             Weight: weight,
             ServiceType: serviceType.ToString()
         );

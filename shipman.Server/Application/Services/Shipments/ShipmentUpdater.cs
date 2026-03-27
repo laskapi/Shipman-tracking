@@ -1,7 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using shipman.Server.Application.Dtos.Shipments;
 using shipman.Server.Application.Exceptions;
-using shipman.Server.Application.Services.Addresses;
 using shipman.Server.Data;
 using shipman.Server.Domain.Entities;
 using shipman.Server.Domain.Enums;
@@ -9,15 +8,13 @@ using shipman.Server.Domain.Enums;
 public class ShipmentUpdater
 {
     private readonly IAppDbContext _db;
-    private readonly AddressService _addressService;
 
-    public ShipmentUpdater(IAppDbContext db, AddressService addressService)
+    public ShipmentUpdater(IAppDbContext db)
     {
         _db = db;
-        _addressService = addressService;
     }
 
-    public async Task UpdateAsync(Shipment shipment, UpdateShipmentDto dto)
+    public async Task UpdateAsync(Shipment shipment, ShipmentUpdateDto dto)
     {
         if (dto.DestinationAddressId is not null)
         {
@@ -32,20 +29,6 @@ public class ShipmentUpdater
             shipment.DestinationAddressId = address.Id;
             shipment.DestinationAddress = address;
         }
-        else if (dto.DestinationAddress is not null)
-        {
-            var newAddress = await _addressService.CreateAddressAsync(dto.DestinationAddress, "DestinationAddress");
-
-            _db.ContactDestinationAddresses.Add(new ContactDestinationAddress
-            {
-                ContactId = shipment.ReceiverId,
-                AddressId = newAddress.Id
-            });
-
-            shipment.DestinationAddressId = newAddress.Id;
-            shipment.DestinationAddress = newAddress;
-        }
-
         if (!string.IsNullOrWhiteSpace(dto.ServiceType))
         {
             if (!Enum.TryParse<ServiceType>(dto.ServiceType, true, out var serviceType))

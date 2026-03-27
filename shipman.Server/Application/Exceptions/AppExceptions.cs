@@ -21,4 +21,12 @@ public class AppDomainException : Exception
     public AppDomainException(string message) : base(message) { }
 }
 
+public class AppInvalidOperationException : Exception
+{
+    public AppInvalidOperationException(string message) : base(message)
+    {
+    }
+}
+
+
 

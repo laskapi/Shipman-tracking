@@ -35,6 +35,8 @@ builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<ShipmentFactory>();
 builder.Services.AddScoped<ShipmentUpdater>();
 builder.Services.AddScoped<AddressService>();
+builder.Services.AddScoped<ShipmentQueries>();
+
 builder.Services.AddScoped<IGeocodingService, GeocodingService>();
 builder.Services.AddHttpClient<GeocodingService>();
 

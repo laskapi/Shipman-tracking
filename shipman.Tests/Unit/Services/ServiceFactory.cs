@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using shipman.Server.Application.Interfaces;
 using shipman.Server.Application.Services.Addresses;
@@ -24,9 +24,10 @@ public static class ServiceFactory
         notifications ??= new FakeNotificationService();
 
         var geocoding = new FakeGeocodingService();
-        var addressService = new AddressService(db, geocoding);
-        var factory = new ShipmentFactory(db, addressService);
-        var updater = new ShipmentUpdater(db, addressService);
+        var shipmentQueries = new ShipmentQueries((AppDbContext)db);
+        var addressService = new AddressService(db, geocoding, shipmentQueries);
+        var factory = new ShipmentFactory(db);
+        var updater = new ShipmentUpdater(db);
 
         return new ShipmentService(logger, db, notifications, factory, updater);
     }

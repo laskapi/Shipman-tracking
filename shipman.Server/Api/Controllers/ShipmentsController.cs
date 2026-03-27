@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using shipman.Server.Application.Dtos;
 using shipman.Server.Application.Dtos.Shipments;
@@ -100,7 +100,7 @@ public class ShipmentsController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult<ShipmentDetailsDto>> Update(Guid id, UpdateShipmentDto dto)
+    public async Task<ActionResult<ShipmentDetailsDto>> Update(Guid id, ShipmentUpdateDto dto)
     {
         _logger.LogInformation("Updating shipment {ShipmentId}", id);
 

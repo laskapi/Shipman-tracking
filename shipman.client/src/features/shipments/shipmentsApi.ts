@@ -1,10 +1,12 @@
 import { api } from "@/services/api";
 import type {
-    MetadataOptionDto,
-    PagedResult,
-    Shipment,
+    ShipmentListItem,
     ShipmentDetails,
-    ShipmentsQueryParams
+    ShipmentsQueryParams,
+    PagedResult,
+    MetadataOptionDto,
+    ContactDto,
+    AddressDto
 } from "./types";
 
 import type { CreateShipmentDto } from "./create/createShipmentSchema";
@@ -13,8 +15,8 @@ import type { EditShipmentDto } from "./edit/editShipmentSchema";
 export const shipmentsApi = api.injectEndpoints({
     endpoints: builder => ({
 
-        // LIST
-        getShipments: builder.query<PagedResult<Shipment>, ShipmentsQueryParams>({
+        // List shipments
+        getShipments: builder.query<PagedResult<ShipmentListItem>, ShipmentsQueryParams>({
             query: params => ({ url: "shipments", params }),
             providesTags: result =>
                 result
@@ -25,13 +27,13 @@ export const shipmentsApi = api.injectEndpoints({
                     : [{ type: "Shipment", id: "LIST" }]
         }),
 
-        // DETAILS
+        // Shipment details
         getShipmentById: builder.query<ShipmentDetails, string>({
             query: id => `shipments/${id}`,
             providesTags: (_result, _error, id) => [{ type: "Shipment", id }]
         }),
 
-        // CREATE
+        // Create shipment
         createShipment: builder.mutation<ShipmentDetails, CreateShipmentDto>({
             query: body => ({
                 url: "shipments",
@@ -41,7 +43,7 @@ export const shipmentsApi = api.injectEndpoints({
             invalidatesTags: [{ type: "Shipment", id: "LIST" }]
         }),
 
-        // UPDATE (partial)
+        // Update shipment
         updateShipment: builder.mutation<
             ShipmentDetails,
             { id: string; data: EditShipmentDto }
@@ -57,7 +59,7 @@ export const shipmentsApi = api.injectEndpoints({
             ]
         }),
 
-        // ADD EVENT
+        // Add shipment event
         addShipmentEvent: builder.mutation<
             ShipmentDetails,
             { id: string; eventType: string }
@@ -73,7 +75,7 @@ export const shipmentsApi = api.injectEndpoints({
             ]
         }),
 
-        // DELETE
+        // Delete shipment
         deleteShipment: builder.mutation<void, string>({
             query: id => ({
                 url: `shipments/${id}`,
@@ -85,13 +87,42 @@ export const shipmentsApi = api.injectEndpoints({
             ]
         }),
 
-        // METADATA
+        // Shipment statuses
         getShipmentStatuses: builder.query<MetadataOptionDto[], void>({
             query: () => "metadata/shipment-statuses"
         }),
 
+        // Shipment event types
         getShipmentEventTypes: builder.query<MetadataOptionDto[], void>({
             query: () => "metadata/shipment-event-types"
+        }),
+
+        // Contacts
+        getContacts: builder.query<ContactDto[], void>({
+            query: () => "contacts"
+        }),
+
+        // Addresses
+        getAddresses: builder.query<AddressDto[], void>({
+            query: () => "addresses"
+        }),
+
+        // Create contact
+        createContact: builder.mutation<ContactDto, Partial<ContactDto>>({
+            query: body => ({
+                url: "contacts",
+                method: "POST",
+                body
+            })
+        }),
+
+        // Create address
+        createAddress: builder.mutation<AddressDto, Partial<AddressDto>>({
+            query: body => ({
+                url: "addresses",
+                method: "POST",
+                body
+            })
         })
     })
 });
@@ -104,5 +135,9 @@ export const {
     useAddShipmentEventMutation,
     useDeleteShipmentMutation,
     useGetShipmentEventTypesQuery,
-    useGetShipmentStatusesQuery
+    useGetShipmentStatusesQuery,
+    useGetContactsQuery,
+    useGetAddressesQuery,
+    useCreateContactMutation,
+    useCreateAddressMutation
 } = shipmentsApi;

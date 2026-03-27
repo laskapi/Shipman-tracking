@@ -48,7 +48,13 @@ public class ExceptionHandlingMiddleware
                         errors = new { General = new[] { dex.Message } }
                     });
                     break;
-
+                case AppInvalidOperationException ioex:
+                    context.Response.StatusCode = (int)HttpStatusCode.Conflict; // 409
+                    await context.Response.WriteAsJsonAsync(new
+                    {
+                        errors = new { General = new[] { ioex.Message } }
+                    });
+                    break;
                 default:
                     context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                     await context.Response.WriteAsJsonAsync(new

@@ -1,4 +1,4 @@
-﻿using shipman.Server.Application.Dtos.Shipments;
+using shipman.Server.Application.Dtos.Shipments;
 
 namespace shipman.Tests.Integration.Factories;
 
@@ -17,27 +17,23 @@ public class ShipmentDtoFactory
 
     public ShipmentCreateDto Create(
         decimal weight = 2.5m,
-        string serviceType = "Standard",
-        AddressDto? destinationAddress = null)
+        string serviceType = "Standard")
     {
         return new ShipmentCreateDto(
             SenderId: _senderId,
             ReceiverId: _receiverId,
             DestinationAddressId: _destinationAddressId,
-            DestinationAddress: destinationAddress,
             Weight: weight,
             ServiceType: serviceType
         );
     }
 
-    public UpdateShipmentDto Update(
+    public ShipmentUpdateDto Update(
         Guid? destinationAddressId = null,
-        AddressDto? destinationAddress = null,
         string? serviceType = null)
     {
-        return new UpdateShipmentDto(
+        return new ShipmentUpdateDto(
             DestinationAddressId: destinationAddressId,
-            DestinationAddress: destinationAddress,
             ServiceType: serviceType
         );
     }

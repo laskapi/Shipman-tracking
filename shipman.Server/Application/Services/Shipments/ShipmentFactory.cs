@@ -1,7 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using shipman.Server.Application.Dtos.Shipments;
 using shipman.Server.Application.Exceptions;
-using shipman.Server.Application.Services.Addresses;
 using shipman.Server.Data;
 using shipman.Server.Domain.Entities;
 using shipman.Server.Domain.Enums;
@@ -11,12 +10,10 @@ namespace shipman.Server.Application.Services.Shipments;
 public class ShipmentFactory
 {
     private readonly IAppDbContext _db;
-    private readonly AddressService _addressService;
 
-    public ShipmentFactory(IAppDbContext db, AddressService addressService)
+    public ShipmentFactory(IAppDbContext db)
     {
         _db = db;
-        _addressService = addressService;
     }
 
     public async Task<Shipment> CreateAsync(ShipmentCreateDto dto)
@@ -56,20 +53,6 @@ public class ShipmentFactory
                     ["DestinationAddressId"] = new[] { "Destination address not found" }
                 });
 
-        }
-        else if (dto.DestinationAddress is not null)
-        {
-            // New address → create + geocode + link to receiver
-            destinationAddress = await _addressService.CreateAddressAsync(
-                dto.DestinationAddress,
-                "DestinationAddress"
-            );
-
-            _db.ContactDestinationAddresses.Add(new ContactDestinationAddress
-            {
-                ContactId = receiver.Id,
-                AddressId = destinationAddress.Id
-            });
         }
         else
         {

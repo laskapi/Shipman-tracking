@@ -1,4 +1,4 @@
-﻿using shipman.Server.Application.Dtos;
+using shipman.Server.Application.Dtos;
 using shipman.Server.Application.Dtos.Shipments;
 using shipman.Tests.Integration.Factories;
 using System.Net;
@@ -78,7 +78,7 @@ public class ShipmentsControllerTests
         var created = await createResponse.Content.ReadFromJsonAsync<ShipmentDetailsDto>(TestJson.Options);
 
         var updateDto = _factory.Dtos.Update(
-            destinationAddress: _factory.Dtos.Address()
+            serviceType: "Express"
         );
 
         var updateResponse = await _client.PutAsJsonAsync($"/api/shipments/{created!.Id}", updateDto);
@@ -87,8 +87,8 @@ public class ShipmentsControllerTests
         Assert.Equal(HttpStatusCode.OK, updateResponse.StatusCode);
         Assert.NotNull(updated);
 
-        Assert.Equal("Rome", updated!.DestinationAddress.City);
-        Assert.Equal("Standard", updated.ServiceType);
+        Assert.Equal("Testville", updated!.DestinationAddress.City);
+        Assert.Equal("Express", updated.ServiceType);
     }
 
     [Fact]
