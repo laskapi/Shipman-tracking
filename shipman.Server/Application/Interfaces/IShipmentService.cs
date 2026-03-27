@@ -1,4 +1,4 @@
-﻿using shipman.Server.Application.Dtos;
+using shipman.Server.Application.Dtos;
 using shipman.Server.Application.Dtos.Shipments;
 using shipman.Server.Domain.Entities;
 
@@ -19,7 +19,7 @@ public interface IShipmentService
 
     Task<Shipment> AddEventAsync(Guid id, ShipmentEventCreateDto dto);
 
-    Task<Shipment> UpdateShipmentAsync(Guid id, UpdateShipmentDto dto);
+    Task<Shipment> UpdateShipmentAsync(Guid id, ShipmentUpdateDto dto);
 
     Task DeleteShipmentAsync(Guid id);
 }

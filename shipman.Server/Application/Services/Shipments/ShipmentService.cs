@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using shipman.Server.Application.Dtos;
 using shipman.Server.Application.Dtos.Shipments;
 using shipman.Server.Application.Exceptions;
@@ -111,7 +111,6 @@ public class ShipmentService : IShipmentService
 
         return shipment;
     }
-
     public async Task<Shipment> AddEventAsync(Guid id, ShipmentEventCreateDto dto)
     {
         var shipment = await _db.Shipments
@@ -162,7 +161,7 @@ public class ShipmentService : IShipmentService
         return shipment;
     }
 
-    public async Task<Shipment> UpdateShipmentAsync(Guid id, UpdateShipmentDto dto)
+    public async Task<Shipment> UpdateShipmentAsync(Guid id, ShipmentUpdateDto dto)
     {
         var shipment = await _db.Shipments
             .Include(s => s.DestinationAddress)

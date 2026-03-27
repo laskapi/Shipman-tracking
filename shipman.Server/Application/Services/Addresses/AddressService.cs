@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using shipman.Server.Application.Dtos.Shipments;
+using Microsoft.EntityFrameworkCore;
+using shipman.Server.Application.Dtos.Addresses;
 using shipman.Server.Application.Exceptions;
 using shipman.Server.Application.Interfaces;
 using shipman.Server.Application.Services.Shipments;
@@ -21,7 +21,7 @@ public class AddressService
         _shipmentQueries = shipmentQueries;
     }
 
-    public async Task<Address> CreateAddressAsync(AddressDto dto, string fieldName)
+    public async Task<Address> CreateAddressAsync(CreateAddressDto dto, string fieldName)
     {
         var address = new Address
         {

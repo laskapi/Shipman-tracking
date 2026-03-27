@@ -1,4 +1,4 @@
-﻿using shipman.Server.Application.Dtos.Shipments;
+using shipman.Server.Application.Dtos.Addresses;
 
 namespace shipman.Server.Application.Dtos.Contacts;
 
@@ -6,5 +6,5 @@ public record UpdateContactDto(
     string? Name,
     string? Email,
     string? Phone,
-    AddressDto? PrimaryAddress
+    CreateAddressDto? PrimaryAddress
 );

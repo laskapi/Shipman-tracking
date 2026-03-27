@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using shipman.Server.Application.Dtos.Addresses;
 using shipman.Server.Application.Dtos.Contacts;
-using shipman.Server.Application.Dtos.Shipments;
 using shipman.Server.Application.Exceptions;
 using shipman.Server.Application.Services.Addresses;
 using shipman.Server.Application.Services.Shipments;
@@ -65,7 +65,7 @@ public class ContactService
             .ToListAsync();
     }
 
-    public async Task<Contact> AddDestinationAddressAsync(Guid contactId, AddressDto dto)
+    public async Task<Contact> AddDestinationAddressAsync(Guid contactId, CreateAddressDto dto)
     {
         var contact = await GetByIdAsync(contactId);
 

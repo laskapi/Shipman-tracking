@@ -1,7 +1,7 @@
-﻿using shipman.Server.Application.Dtos.Shipments;
+using shipman.Server.Application.Dtos.Addresses;
 
 namespace shipman.Server.Application.Dtos.Contacts;
 
 public record AddDestinationAddressDto(
-    AddressDto Address
+    CreateAddressDto Address
 );

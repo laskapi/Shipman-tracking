@@ -5,11 +5,11 @@ namespace shipman.Server.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AddressController : ControllerBase
+public class AddressesController : ControllerBase
 {
     private readonly AddressService _addressService;
 
-    public AddressController(AddressService addressService)
+    public AddressesController(AddressService addressService)
     {
         _addressService = addressService;
     }
