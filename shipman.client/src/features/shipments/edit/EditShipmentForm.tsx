@@ -1,4 +1,5 @@
 import { Stack } from "@mui/material";
+import { FORM_STACK_SPACING } from "@/ui/formSpacing";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
@@ -41,7 +42,7 @@ export default function EditShipmentForm({
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
-            <Stack spacing={3}>
+            <Stack spacing={FORM_STACK_SPACING}>
                 <ContactAutocomplete
                     name="receiverId"
                     label="Receiver"
@@ -52,9 +53,10 @@ export default function EditShipmentForm({
 
                 <AddressAutocomplete
                     name="destinationAddressId"
-                    label="Destination Address"
+                    label="Destination address"
                     control={control}
                     setValue={setValue}
+                    receiverFieldName="receiverId"
                     error={errors.destinationAddressId?.message}
                 />
 

@@ -9,8 +9,13 @@ import
 import { useState } from "react";
 import { Controller } from "react-hook-form";
 
-import { useGetContactsQuery } from "../shipmentsApi";
-import AddContactModal from "./AddContactModal";
+import type { ContactListItemDto } from '../types';
+import { useGetContactsQuery } from '../shipmentsApi';
+import AddContactModal from './AddContactModal';
+
+const ADD_NEW_ID = '__add_new__';
+
+type Option = ContactListItemDto | { id: typeof ADD_NEW_ID; name: string; email: null; phone: null };
 
 interface Props
 {
@@ -32,9 +37,9 @@ export default function ContactAutocomplete({
     const { data: contacts = [], isLoading } = useGetContactsQuery();
     const [openModal, setOpenModal] = useState(false);
 
-    const options = [
+    const options: Option[] = [
         ...contacts,
-        { id: "__add_new__", name: "Add new contact", email: "" }
+        { id: ADD_NEW_ID, name: 'Add new contact', email: null, phone: null }
     ];
 
     return (
@@ -49,7 +54,7 @@ export default function ContactAutocomplete({
                         }
                         onChange={(_, value) =>
                         {
-                            if (value?.id === "__add_new__")
+                            if (value?.id === ADD_NEW_ID)
                             {
                                 setOpenModal(true);
                                 return;
@@ -59,13 +64,13 @@ export default function ContactAutocomplete({
                         options={options}
                         loading={isLoading}
                         getOptionLabel={option =>
-                            option.id === "__add_new__"
-                                ? "Add new contact"
+                            option.id === ADD_NEW_ID
+                                ? 'Add new contact'
                                 : option.name
                         }
                         renderOption={(props, option) => (
                             <Box component="li" {...props}>
-                                {option.id === "__add_new__" ? (
+                                {option.id === ADD_NEW_ID ? (
                                     <Typography color="primary">
                                         ➕ Add new contact
                                     </Typography>
@@ -87,6 +92,10 @@ export default function ContactAutocomplete({
                                 label={label}
                                 error={!!error}
                                 helperText={error}
+                                inputProps={{
+                                    ...params.inputProps,
+                                    autoComplete: 'off',
+                                }}
                                 InputProps={{
                                     ...params.InputProps,
                                     endAdornment: (

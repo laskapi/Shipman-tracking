@@ -1,4 +1,5 @@
 import { Stack, TextField } from "@mui/material";
+import { FORM_STACK_SPACING } from "@/ui/formSpacing";
 import type { UseFormRegister, FieldErrors } from "react-hook-form";
 
 interface Props
@@ -16,7 +17,7 @@ export function PersonFields({ register, errors, prefix }: Props)
     const e = (errors?.[prefix] ?? {}) as Record<string, any>;
 
     return (
-        <Stack spacing={1}>
+        <Stack spacing={FORM_STACK_SPACING}>
             <TextField
                 fullWidth
                 label="Name"

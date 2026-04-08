@@ -1,10 +1,21 @@
 import { Box, Typography } from "@mui/material"
 import PanelHeader from "@/ui/PanelHeader"
-import type { ShipmentDetails } from "@/features/shipments/types"
+import type { AddressDto, ShipmentDetails } from "@/features/shipments/types"
 
 interface ShipmentRouteDetailsProps
 {
     shipment: ShipmentDetails
+}
+
+function formatAddress(a: AddressDto): string
+{
+    const parts = [
+        [a.street, a.houseNumber].filter(Boolean).join(" "),
+        a.apartmentNumber ? `apt. ${a.apartmentNumber}` : null,
+        [a.postalCode, a.city].filter(Boolean).join(" "),
+        a.country
+    ].filter(Boolean);
+    return parts.join(", ");
 }
 
 export function ShipmentRouteDetails({ shipment }: ShipmentRouteDetailsProps)
@@ -21,7 +32,7 @@ export function ShipmentRouteDetails({ shipment }: ShipmentRouteDetailsProps)
                     display: "grid",
                     gridTemplateColumns: hasEta ? "repeat(3, 1fr)" : "repeat(2, 1fr)",
                     columnGap: 2,
-                    rowGap: 0.5,
+                    rowGap: 2,
                 }}
             >
                 <Typography variant="caption" color="text.secondary">Origin</Typography>
@@ -42,13 +53,13 @@ export function ShipmentRouteDetails({ shipment }: ShipmentRouteDetailsProps)
             >
                 <Box sx={{ overflowY: "auto", minHeight: 0 }}>
                     <Typography variant="body1" fontWeight={500}>
-                        {shipment.origin}
+                        {formatAddress(shipment.sender.address)}
                     </Typography>
                 </Box>
 
                 <Box sx={{ overflowY: "auto", minHeight: 0 }}>
                     <Typography variant="body1" fontWeight={500}>
-                        {shipment.destination}
+                        {formatAddress(shipment.destinationAddress)}
                     </Typography>
                 </Box>
 

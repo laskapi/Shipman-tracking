@@ -1,9 +1,11 @@
-﻿import { Box, Card, CardContent, Container } from "@mui/material";
+import { Box, Card, CardContent, Container } from "@mui/material";
 import { useDispatch } from "react-redux";
 import { useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { Navigate, useParams, useNavigate } from "react-router-dom";
 
 import { setHeader, HeaderActionsType } from "@/app/headerSlice";
+import { isShipmentLockedForEdit } from "@/features/shipments/shipmentEditPolicy";
+import { formCardContentSx } from "@/ui/formSpacing";
 import
     {
         shipmentsApi,
@@ -41,6 +43,11 @@ export default function EditShipmentPage()
 
     if (isLoading || !shipment) return null;
 
+    if (isShipmentLockedForEdit(shipment.status))
+    {
+        return <Navigate to={`/shipments/${id}`} replace />;
+    }
+
     const initialValues: EditShipmentDto = {
         receiverId: shipment.receiverId,
         destinationAddressId: shipment.destinationAddressId,
@@ -67,9 +74,9 @@ export default function EditShipmentPage()
 
     return (
         <Container maxWidth="sm">
-            <Box mt={4}>
+            <Box mt={2} mb={2}>
                 <Card>
-                    <CardContent>
+                    <CardContent sx={formCardContentSx}>
                         <EditShipmentForm
                             shipment={shipment}
                             initialValues={initialValues}

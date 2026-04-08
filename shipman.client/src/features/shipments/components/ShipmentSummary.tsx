@@ -1,4 +1,4 @@
-﻿import type { ShipmentDetails } from "@/features/shipments/types"
+import type { ShipmentDetails } from "@/features/shipments/types"
 import PanelHeader from "@/ui/PanelHeader"
 import { Box, Grid, Typography } from "@mui/material"
 
@@ -19,7 +19,7 @@ export default function ShipmentSummary({ shipment }: Props)
         >
             <PanelHeader>Shipment Summary</PanelHeader>
 
-            <Grid container spacing={1.5}>
+            <Grid container spacing={2}>
                 <Grid size={{ xs: 12, md: 6 }}>
                     <SummaryItem label="Tracking Number" value={shipment.trackingNumber} />
                 </Grid>

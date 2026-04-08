@@ -5,6 +5,7 @@ using shipman.Server.Application.Interfaces;
 using shipman.Server.Application.Services.Shipments;
 using shipman.Server.Data;
 using shipman.Server.Domain.Entities;
+using System.Linq;
 namespace shipman.Server.Application.Services.Addresses;
 
 public class AddressService
@@ -40,11 +41,22 @@ public class AddressService
             address.Latitude = geo.Lat;
             address.Longitude = geo.Lng;
         }
+        catch (AppValidationException ex)
+        {
+            var message = ex.Errors.Values.SelectMany(a => a).FirstOrDefault() ?? "Address not found";
+            throw new AppValidationException(new Dictionary<string, string[]>
+            {
+                [fieldName] = new[] { message }
+            });
+        }
         catch
         {
             throw new AppValidationException(new Dictionary<string, string[]>
             {
-                [fieldName] = new[] { "Address not found" }
+                [fieldName] = new[]
+                {
+                    "Could not verify this address (geocoding failed). Check the address or try again later."
+                }
             });
         }
 

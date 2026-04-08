@@ -1,13 +1,16 @@
-import { z } from "zod";
+import { z } from 'zod';
+import { createAddressSchema } from '@/features/addresses/addressSchema';
 
 const phoneRegex = /^\+?[0-9\s\-]{7,20}$/;
 
-// Schema for creating a contact
 export const createContactSchema = z.object({
-    name: z.string().min(1, "Name is required"),
-    email: z.string().email("Invalid email"),
-    phone: z.string().regex(phoneRegex, "Invalid phone number"),
-    addressId: z.string().nullable()
+    name: z.string().trim().min(1, 'Name is required'),
+    email: z.string().trim().email('Invalid email'),
+    phone: z
+        .string()
+        .trim()
+        .regex(phoneRegex, 'Use 7–20 digits; optional + and spaces/dashes'),
+    primaryAddress: createAddressSchema
 });
 
-export type CreateContactDto = z.infer<typeof createContactSchema>;
+export type CreateContactFormValues = z.infer<typeof createContactSchema>;

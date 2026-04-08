@@ -1,9 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using shipman.Server.Application.Exceptions;
 using shipman.Server.Application.Interfaces;
 using shipman.Server.Data;
 using shipman.Server.Domain.Entities;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -43,7 +45,16 @@ public class GeocodingService : IGeocodingService
 
     public Task<GeocodeResult> GeocodeAsync(Address address)
     {
-        var full = $"{address.Street}, {address.City}, {address.PostalCode}, {address.Country}";
+        var streetLine = string.Join(' ', new[] { address.Street, address.HouseNumber }
+            .Where(s => !string.IsNullOrWhiteSpace(s)));
+        var parts = new List<string>();
+        if (!string.IsNullOrWhiteSpace(streetLine)) parts.Add(streetLine);
+        if (!string.IsNullOrWhiteSpace(address.ApartmentNumber))
+            parts.Add($"apt. {address.ApartmentNumber}");
+        if (!string.IsNullOrWhiteSpace(address.PostalCode)) parts.Add(address.PostalCode);
+        if (!string.IsNullOrWhiteSpace(address.City)) parts.Add(address.City);
+        if (!string.IsNullOrWhiteSpace(address.Country)) parts.Add(address.Country);
+        var full = string.Join(", ", parts);
         return GeocodeAsync(full);
     }
 
@@ -74,7 +85,10 @@ public class GeocodingService : IGeocodingService
         if (response == null || response.Count == 0)
             throw new AppValidationException(new Dictionary<string, string[]>
             {
-                ["Address"] = new[] { "Address not found" }
+                ["Address"] = new[]
+                {
+                    "No location found for this address. Use a real postal address (street, number, city, postal code, country) and check spelling."
+                }
             });
 
         var result = response[0];

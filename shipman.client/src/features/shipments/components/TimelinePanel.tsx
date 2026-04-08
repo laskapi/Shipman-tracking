@@ -1,4 +1,4 @@
-﻿import { Box } from "@mui/material";
+import { Box } from "@mui/material";
 import Timeline from "./Timeline";
 import PanelHeader from "@/ui/PanelHeader";
 import type { ShipmentEvent } from "@/features/shipments/types";
@@ -12,7 +12,7 @@ export default function TimelinePanel({ events }: { events: ShipmentEvent[] })
                     top: 0,
                     zIndex: 1,
                     backgroundColor: "background.paper",
-                    pb: 1,
+                    pb: 2,
                 }}
             >
                 <PanelHeader>Tracking History</PanelHeader>

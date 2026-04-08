@@ -117,6 +117,7 @@ public class ShipmentService : IShipmentService
             .Include(s => s.Events)
             .Include(s => s.DestinationAddress)
             .Include(s => s.Sender).ThenInclude(c => c.PrimaryAddress)
+            .Include(s => s.Receiver)
             .FirstOrDefaultAsync(s => s.Id == id);
 
         if (shipment == null)

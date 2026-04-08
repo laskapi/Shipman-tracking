@@ -1,4 +1,4 @@
-﻿import { Box, Paper, Typography } from "@mui/material"
+import { Box, Paper, Typography } from "@mui/material"
 import { ShipmentsToolbar } from "./components/ShipmentsToolbar"
 import type { ShipmentsController } from "./types"
 
@@ -51,7 +51,8 @@ export function MobileShipmentsView({ ctrl }: { ctrl: ShipmentsController }) {
                             Shipment #{s.trackingNumber}
                         </Typography>
 
-                        <Typography color="text.secondary">Origin: {s.origin}</Typography>
+                        <Typography color="text.secondary">Sender: {s.sender}</Typography>
+                        <Typography color="text.secondary">Receiver: {s.receiver}</Typography>
                         <Typography color="text.secondary">Destination: {s.destination}</Typography>
                         <Typography color="text.secondary">Status: {s.status}</Typography>
                         <Typography color="text.secondary">Last updated: {s.updatedAt}</Typography>

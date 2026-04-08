@@ -1,4 +1,4 @@
-﻿import { Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 
 export default function PanelHeader({ children }: { children: React.ReactNode })
 {
@@ -6,7 +6,7 @@ export default function PanelHeader({ children }: { children: React.ReactNode })
         <Typography
             variant="subtitle1"
             sx={{
-                pb: 1,
+                pb: 2,
                 fontWeight: 600,
             }}
         >

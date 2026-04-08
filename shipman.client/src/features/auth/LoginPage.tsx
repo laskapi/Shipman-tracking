@@ -3,9 +3,11 @@ import {
     Box,
     Button,
     Paper,
+    Stack,
     TextField,
     Typography,
 } from '@mui/material'
+import { FORM_STACK_SPACING } from '@/ui/formSpacing'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
 import type { LoginSchema } from './schemas/loginSchema'
@@ -43,18 +45,20 @@ export default function Login() {
                 
             }}
         >
-            <Paper sx={{ p: 4, width: '100%', maxWidth: 400 }}>
+            <Paper sx={{ px: 2, py: 2, width: '100%', maxWidth: 400 }}>
                 <Typography variant="h4" textAlign="center" mb={2}>
                     Login
                 </Typography>
 
-                <Box
+                <Stack
                     component="form"
+                    spacing={FORM_STACK_SPACING}
                     onSubmit={handleSubmit(onSubmit)}
-                    sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
                 >
                     <TextField
                         label="Email"
+                        type="email"
+                        autoComplete="email"
                         {...register('email')}
                         error={!!errors.email}
                         helperText={errors.email?.message}
@@ -63,6 +67,7 @@ export default function Login() {
                     <TextField
                         label="Password"
                         type="password"
+                        autoComplete="current-password"
                         {...register('password')}
                         error={!!errors.password}
                         helperText={errors.password?.message}
@@ -77,7 +82,7 @@ export default function Login() {
                             Login failed
                         </Typography>
                     )}
-                </Box>
+                </Stack>
                 <Typography variant="body2" textAlign="center" sx={{ mt: 2 }}>
                     Don't have an account? <Link to="/register">Create one</Link>
                 </Typography>

@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { setHeader, HeaderActionsType } from "@/app/headerSlice";
+import { formCardContentSx } from "@/ui/formSpacing";
 import { shipmentsApi, useCreateShipmentMutation } from "../shipmentsApi";
 
 import CreateShipmentForm from "./CreateShipmentForm";
@@ -48,9 +49,9 @@ export default function CreateShipmentPage()
 
     return (
         <Container maxWidth="sm">
-            <Box mt={4}>
+            <Box mt={2} mb={2}>
                 <Card>
-                    <CardContent>
+                    <CardContent sx={formCardContentSx}>
                         <CreateShipmentForm
                             onSubmit={handleCreate}
                             isLoading={isLoading}

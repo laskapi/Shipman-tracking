@@ -1,7 +1,9 @@
-import { Button, Box } from "@mui/material"
+import { Box, Button, Tooltip } from "@mui/material"
 import { useSelector } from "react-redux"
 import { useNavigate, useParams, Outlet } from "react-router"
 import { HeaderActionsType } from "../app/headerSlice"
+import { useGetShipmentByIdQuery } from "@/features/shipments/shipmentsApi"
+import { isShipmentLockedForEdit } from "@/features/shipments/shipmentEditPolicy"
 import { PageHeader } from "./PageHeader"
 import type { RootState } from "../app/store"
 
@@ -10,6 +12,11 @@ export function PageLayout()
     const header = useSelector((state: RootState) => state.header)
     const navigate = useNavigate()
     const { id } = useParams()
+
+    const { data: detailsShipment } = useGetShipmentByIdQuery(id!, {
+        skip: !id || header.actionsType !== HeaderActionsType.ShipmentDetails
+    })
+    const shipmentEditDisabled = isShipmentLockedForEdit(detailsShipment?.status)
 
     let actions = null
 
@@ -29,13 +36,23 @@ export function PageLayout()
                     <Button variant="outlined" onClick={() => navigate("/shipments")}>
                         Back
                     </Button>
-                    <Button
-                        variant="contained"
-                        onClick={() => navigate(`/shipments/${id}/edit`)}
-                        sx={{ ml: 2 }}
+                    <Tooltip
+                        title="Delivered or cancelled shipments cannot be edited."
+                        disableHoverListener={!shipmentEditDisabled}
+                        disableFocusListener={!shipmentEditDisabled}
+                        disableTouchListener={!shipmentEditDisabled}
                     >
-                        Edit
-                    </Button>
+                        <span>
+                            <Button
+                                variant="contained"
+                                disabled={shipmentEditDisabled}
+                                onClick={() => navigate(`/shipments/${id}/edit`)}
+                                sx={{ ml: 2 }}
+                            >
+                                Edit
+                            </Button>
+                        </span>
+                    </Tooltip>
                 </>
             )
             break

@@ -1,4 +1,5 @@
 import { Card, CardHeader, CardContent } from "@mui/material";
+import { formCardContentSx } from "@/ui/formSpacing";
 
 interface Props
 {
@@ -11,7 +12,7 @@ export function FormCard({ title, children }: Props)
     return (
         <Card>
         <CardHeader title= { title } />
-        <CardContent>{ children } </CardContent>
+        <CardContent sx={formCardContentSx}>{children}</CardContent>
         </Card>
   );
 }

@@ -1,3 +1,5 @@
+import type { GridSortModel } from '@mui/x-data-grid';
+
 // Shipment event shown in the timeline
 export interface ShipmentEvent
 {
@@ -9,16 +11,40 @@ export interface ShipmentEvent
 }
 
 // Supported service levels
-export type ServiceType = "Standard" | "Express" | "Freight";
+export type ServiceType = 'Standard' | 'Express' | 'Freight';
 
-// Used in shipment list/table views
+/** Party on shipment details (matches API nested sender/receiver) */
+export interface ShipmentPartyDto
+{
+    id: string;
+    name: string;
+    email: string;
+    phone: string;
+    address: AddressDto;
+}
+
+/** Address as returned by API (includes id and coordinates) */
+export interface AddressDto
+{
+    id: string;
+    street: string;
+    houseNumber: string;
+    apartmentNumber: string | null;
+    city: string;
+    postalCode: string;
+    country: string;
+    latitude: number;
+    longitude: number;
+}
+
+// Used in shipment list/table views (matches ShipmentListItemDto)
 export interface ShipmentListItem
 {
     id: string;
     trackingNumber: string;
-    senderId: string;
-    receiverId: string;
-    destinationAddressId: string | null;
+    sender: string;
+    receiver: string;
+    destination: string;
     status: string;
     updatedAt: string;
 }
@@ -31,7 +57,11 @@ export interface ShipmentDetails
 
     senderId: string;
     receiverId: string;
-    destinationAddressId: string | null;
+    destinationAddressId: string;
+
+    sender: ShipmentPartyDto;
+    receiver: ShipmentPartyDto;
+    destinationAddress: AddressDto;
 
     weight: number;
     serviceType: ServiceType;
@@ -44,31 +74,24 @@ export interface ShipmentDetails
     events: ShipmentEvent[];
 }
 
-// Contact used for sender/receiver selection
-export interface ContactDto
+/** Contact row from GET /api/contacts */
+export interface ContactListItemDto
+{
+    id: string;
+    name: string;
+    email: string | null;
+    phone: string | null;
+}
+
+/** Contact from GET /api/contacts/:id */
+export interface ContactDetailsDto
 {
     id: string;
     name: string;
     email: string;
     phone: string;
-    addressId: string | null;
-}
-
-// Address used for shipment destination
-export interface AddressDto
-{
-    id: string;
-    street: string;
-    city: string;
-    postalCode: string;
-    country: string;
-}
-
-// Coordinates returned by backend for map display
-export interface CoordinatesDto
-{
-    lat: number;
-    lng: number;
+    primaryAddress: AddressDto;
+    destinationAddresses: AddressDto[];
 }
 
 // Generic paginated API response
@@ -89,7 +112,7 @@ export interface ShipmentsQueryParams
     trackingNumber?: string;
     status?: string;
     sortBy?: string;
-    direction?: "asc" | "desc";
+    direction?: 'asc' | 'desc';
 }
 
 // Used for dropdowns (statuses, service types, etc.)
@@ -97,4 +120,36 @@ export interface MetadataOptionDto
 {
     value: string;
     label: string;
+}
+
+export interface ShipmentsToolbarController
+{
+    statuses: MetadataOptionDto[];
+    status: string;
+    search: string;
+    setStatus: (value: string) => void;
+    setSearch: (value: string) => void;
+    clear: () => void;
+    refresh: () => void;
+}
+
+export interface ShipmentsController
+{
+    data: PagedResult<ShipmentListItem> | undefined;
+    statuses: MetadataOptionDto[];
+    status: string;
+    search: string;
+    sortModel: GridSortModel;
+    page: number;
+    pageSize: number;
+    isLoading: boolean;
+    isError: boolean;
+    setStatus: (value: string) => void;
+    setSearch: (value: string) => void;
+    setSortModel: (model: GridSortModel) => void;
+    setPage: (page: number) => void;
+    setPageSize: (size: number) => void;
+    refetch: () => void;
+    handleRowClick: (params: { id: string | number }) => void;
+    toolbar: ShipmentsToolbarController;
 }

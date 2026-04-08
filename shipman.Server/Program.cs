@@ -8,6 +8,7 @@ using shipman.Server.Api.Middleware;
 using shipman.Server.Application.Interfaces;
 using shipman.Server.Application.Services;
 using shipman.Server.Application.Services.Addresses;
+using shipman.Server.Application.Services.Contacts;
 using shipman.Server.Application.Services.Geocoding;
 using shipman.Server.Application.Services.Shipments;
 using shipman.Server.Data;
@@ -35,6 +36,7 @@ builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<ShipmentFactory>();
 builder.Services.AddScoped<ShipmentUpdater>();
 builder.Services.AddScoped<AddressService>();
+builder.Services.AddScoped<ContactService>();
 builder.Services.AddScoped<ShipmentQueries>();
 
 builder.Services.AddScoped<IGeocodingService, GeocodingService>();

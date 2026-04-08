@@ -1,4 +1,4 @@
-﻿import { Box, Divider, Paper } from "@mui/material"
+import { Box, Divider, Paper } from "@mui/material"
 import { useEffect } from "react"
 import { useDispatch } from "react-redux"
 import { useParams } from "react-router"
@@ -103,7 +103,10 @@ export default function ShipmentDetailsPage()
                     </Box>
 
                     <Divider sx={{ my: 2 }} />
-                    <EventActionsPanel shipmentId={shipment.id} />
+                    <EventActionsPanel
+                        shipmentId={shipment.id}
+                        status={shipment.status}
+                    />
                 </Box>
             </Paper>
 
@@ -114,7 +117,7 @@ export default function ShipmentDetailsPage()
                     display: "flex",
                     flexDirection: "column",
                     overflow: "hidden",
-                    gap: 1,
+                    gap: 2,
                 }}
             >
                 <Box
@@ -125,8 +128,14 @@ export default function ShipmentDetailsPage()
                     }}
                 >
                     <ShipmentMapPreview
-                        origin={shipment.originCoordinates}
-                        destination={shipment.destinationCoordinates}
+                        origin={{
+                            lat: shipment.sender.address.latitude,
+                            lng: shipment.sender.address.longitude
+                        }}
+                        destination={{
+                            lat: shipment.destinationAddress.latitude,
+                            lng: shipment.destinationAddress.longitude
+                        }}
                     />
                 </Box>
                 {/* SCROLLABLE DETAILS */}

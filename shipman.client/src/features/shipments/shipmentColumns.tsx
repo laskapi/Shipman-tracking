@@ -10,8 +10,14 @@ export const shipmentsColumns: GridColDef<ShipmentListItem>[] = [
         minWidth: 150,
     },
     {
-        field: "origin",
-        headerName: "Origin",
+        field: "sender",
+        headerName: "Sender",
+        flex: 1,
+        minWidth: 120,
+    },
+    {
+        field: "receiver",
+        headerName: "Receiver",
         flex: 1,
         minWidth: 120,
     },
@@ -39,6 +45,4 @@ export const shipmentsColumns: GridColDef<ShipmentListItem>[] = [
         valueGetter: (value) =>
             value ? new Date(value).toLocaleString() : "",
     }
-
-,
 ]

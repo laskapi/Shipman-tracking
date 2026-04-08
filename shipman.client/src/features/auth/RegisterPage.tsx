@@ -8,9 +8,11 @@ import {
     Box,
     Button,
     Paper,
+    Stack,
     TextField,
     Typography
 } from "@mui/material"
+import { FORM_STACK_SPACING } from "@/ui/formSpacing"
 import { Link, useNavigate } from "react-router-dom"
 
 export default function Register() {
@@ -44,18 +46,20 @@ export default function Register() {
                 justifyContent: "center"
             }}
         >
-            <Paper sx={{ p: 4, width: "100%", maxWidth: 400 }}>
+            <Paper sx={{ px: 2, py: 2, width: "100%", maxWidth: 400 }}>
                 <Typography variant="h4" textAlign="center" mb={2}>
                     Register
                 </Typography>
 
-                <Box
+                <Stack
                     component="form"
+                    spacing={FORM_STACK_SPACING}
                     onSubmit={handleSubmit(onSubmit)}
-                    sx={{ display: "flex", flexDirection: "column", gap: 2 }}
                 >
                     <TextField
                         label="Email"
+                        type="email"
+                        autoComplete="email"
                         {...register("email")}
                         error={!!errors.email}
                         helperText={errors.email?.message}
@@ -64,6 +68,7 @@ export default function Register() {
                     <TextField
                         label="Password"
                         type="password"
+                        autoComplete="new-password"
                         {...register("password")}
                         error={!!errors.password}
                         helperText={errors.password?.message}
@@ -72,6 +77,7 @@ export default function Register() {
                     <TextField
                         label="Confirm Password"
                         type="password"
+                        autoComplete="new-password"
                         {...register("confirmPassword")}
                         error={!!errors.confirmPassword}
                         helperText={errors.confirmPassword?.message}
@@ -86,7 +92,7 @@ export default function Register() {
                             Registration failed
                         </Typography>
                     )}
-                </Box>
+                </Stack>
                 <Typography variant="body2" textAlign="center" sx={{ mt: 2 }}>
                     Already have an account? <Link to="/login">Log in</Link>
                 </Typography>

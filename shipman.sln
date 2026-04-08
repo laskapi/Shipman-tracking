@@ -1,9 +1,9 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
 VisualStudioVersion = 18.2.11408.102
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "shipman.Client", "shipman.Client\shipman.Client.esproj", "{74DA8B19-4EF7-AC30-F729-D24B8154F0F0}"
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "shipman.client", "shipman.client\shipman.client.esproj", "{74DA8B19-4EF7-AC30-F729-D24B8154F0F0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "shipman.Server", "shipman.Server\shipman.Server.csproj", "{281FF249-5646-4065-8E26-7392835E9E66}"
 EndProject

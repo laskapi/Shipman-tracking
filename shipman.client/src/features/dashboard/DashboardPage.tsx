@@ -1,6 +1,6 @@
 import { HeaderActionsType, setHeader } from "@/app/headerSlice"
 import { useGetProfileQuery } from "@/features/auth/authApi"
-import { Typography } from "@mui/material"
+import { Box, Typography } from "@mui/material"
 import { useEffect } from "react"
 import { useDispatch } from "react-redux"
 
@@ -22,10 +22,10 @@ export default function DashboardPage() {
     if (isLoading) return <p>Loading...</p>
 
     return (
-        <>
-            <Typography variant="body1" sx={{ mt: 2 }}>
+        <Box mt={2} mb={2}>
+            <Typography variant="body1">
                 This is your dashboard. More widgets coming soon.
             </Typography>
-        </>
+        </Box>
     )
 }

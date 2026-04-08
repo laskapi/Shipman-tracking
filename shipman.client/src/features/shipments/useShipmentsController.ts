@@ -1,4 +1,4 @@
-﻿import { useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import
     {
         shipmentsApi,
@@ -6,7 +6,7 @@ import
         useGetShipmentStatusesQuery
     } from "./shipmentsApi";
 import { useShipmentQueryParams } from "./useShipmentQueryParams";
-import type { ShipmentsController } from "./controllerTypes";
+import type { ShipmentsController } from "./types";
 
 export function useShipmentsController(): ShipmentsController
 {

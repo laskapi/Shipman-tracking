@@ -20,7 +20,7 @@ export function ShipmentsToolbar({ ctrl }: { ctrl: ShipmentsToolbarController })
                 py: { xs: 1, md: 1 },
                 display: "flex",
                 flexDirection: { xs: "column", md: "row" },
-                gap: { xs: 1.5, md: 2 },
+                gap: 2,
                 alignItems: { xs: "stretch", md: "center" },
                 backgroundColor: "background.paper",
             }}
@@ -57,7 +57,7 @@ export function ShipmentsToolbar({ ctrl }: { ctrl: ShipmentsToolbarController })
 
             <Stack
                 direction={{ xs: "column", md: "row" }}
-                spacing={1.5}
+                spacing={2}
             >
                 <Button
                     variant="outlined"

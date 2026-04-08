@@ -1,4 +1,4 @@
-﻿import { AppBar, Breadcrumbs, Stack, Toolbar, Typography } from "@mui/material"
+import { AppBar, Breadcrumbs, Stack, Toolbar, Typography } from "@mui/material"
 import { Link as RouterLink } from "react-router-dom"
 
 interface PageHeaderProps {
@@ -30,7 +30,7 @@ export function PageHeader({ title, subtitle, breadcrumb, actions }: PageHeaderP
                 }}
             >
                 {breadcrumb && (
-                    <Breadcrumbs sx={{ mb: 1 }}>
+                    <Breadcrumbs sx={{ mb: 2 }}>
                         {breadcrumb.map((item, i) =>
                             item.to ? (
                                 <RouterLink

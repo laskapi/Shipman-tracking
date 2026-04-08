@@ -79,7 +79,7 @@ public class ContactService
 
         await _db.SaveChangesAsync();
 
-        return contact;
+        return await GetByIdAsync(contactId);
     }
 
     public async Task<Contact> UpdateAsync(Guid id, UpdateContactDto dto)

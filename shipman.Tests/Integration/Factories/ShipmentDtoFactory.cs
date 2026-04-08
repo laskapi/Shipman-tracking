@@ -39,6 +39,7 @@ public class ShipmentDtoFactory
     }
 
     public AddressDto Address(
+        Guid? id = null,
         string street = "Via Roma",
         string houseNumber = "1",
         string? apartmentNumber = null,
@@ -49,6 +50,7 @@ public class ShipmentDtoFactory
         double longitude = 12.4964)
     {
         return new AddressDto(
+            Id: id ?? Guid.NewGuid(),
             Street: street,
             HouseNumber: houseNumber,
             ApartmentNumber: apartmentNumber,
